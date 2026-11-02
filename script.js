@@ -127,10 +127,11 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   function updateJobButtons() {
-    $$("[data-job]").forEach(button => {
+    $("[data-job]").forEach(button => {
       const job = jobs[button.dataset.job];
-      button.textContent = state.job && state.job.title === job.title ? "Current job" : "Apply now";
-      button.disabled = !!(state.job && state.job.title === job.title);
+      const isCurrent = state.job && state.job.title === job.title;
+      button.textContent = isCurrent ? "Work 4-hour shift" : state.job ? "Already employed" : "Apply now";
+      button.disabled = !!state.job && !isCurrent;
       button.style.opacity = button.disabled ? ".65" : "1";
     });
   }
@@ -240,7 +241,8 @@
     const jobButton = event.target.closest("[data-job]");
     if (jobButton) {
       const job = jobs[jobButton.dataset.job];
-      if (!job || state.job) { toast(state.job ? "You already have a job. Work a shift to earn money." : "That job is unavailable."); return; }
+      if (state.job && job && state.job.title === job.title) { earnShift(); return; }
+      if (!job || state.job) { toast(state.job ? "You already have a job. Work a shift at your current workplace." : "That job is unavailable."); return; }
       state.job = job;
       render();
       toast("You're hired! Welcome aboard as a " + job.title + ".");
