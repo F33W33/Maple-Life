@@ -23,6 +23,8 @@
         <button class="nav-item" data-view="jobs"><span>▤</span> Careers & jobs</button>
         <button class="nav-item" data-view="home-life"><span>⌂</span> My home</button>
         <button class="nav-item" data-view="shop"><span>🛍</span> Marketplace</button>
+        <button class="nav-item" data-view="wallet"><span>＄</span> Wallet & bank</button>
+        <button class="nav-item" data-view="phone"><span>▣</span> My phone</button>
       </nav>
       <div class="sidebar-bottom">
         <div class="weather-mini"><span id="weatherIcon">☀️</span><div><strong id="weatherLabel">Clear skies</strong><small id="weatherTemp">18°C · Spring</small></div></div>
@@ -114,6 +116,19 @@
           <article class="shop-item"><div class="shop-item-art">📚</div><div class="shop-item-copy"><span class="place-type">LIFESTYLE</span><h3>Paperback Book</h3><p>A new story for a quiet evening.</p><strong>$16.00</strong><button class="primary-button small-button" data-buy="book">Buy item</button></div></article>
           <article class="shop-item"><div class="shop-item-art">🪴</div><div class="shop-item-copy"><span class="place-type">HOME</span><h3>Little Houseplant</h3><p>Add a touch of green to your space.</p><strong>$18.00</strong><button class="primary-button small-button" data-buy="plant">Buy item</button></div></article>
         </div>
+      </section>
+      <section id="walletView" class="view">
+        <div class="page-heading"><div><div class="eyebrow">KEEP TRACK OF YOUR MONEY</div><h1>Your <em>wallet.</em></h1><p>Every dollar counts. See what you've earned and where it's gone.</p></div></div>
+        <div class="wallet-layout">
+          <div class="wallet-card"><div class="wallet-card-top"><span>🍁 MAPLE BANK</span><span>CANADIAN DOLLAR</span></div><small>AVAILABLE BALANCE</small><strong id="walletBalance">$1,000.00</strong><div class="wallet-card-bottom"><span id="walletHolder">NEW RESIDENT</span><span>•••• 2048</span></div></div>
+          <div class="wallet-summary"><div><small>TOTAL EARNED</small><strong id="totalEarned">$0.00</strong></div><div><small>TOTAL SPENT</small><strong id="totalSpent">$0.00</strong></div></div>
+        </div>
+        <div class="section-heading"><div><div class="eyebrow">YOUR MONEY MOVEMENTS</div><h2>Recent transactions</h2></div><span class="more-label">CAD</span></div>
+        <div class="panel wallet-transactions" id="walletTransactions"><div class="empty-wallet">Your first paycheque or purchase will appear here.</div></div>
+      </section>
+      <section id="phoneView" class="view">
+        <div class="page-heading"><div><div class="eyebrow">YOUR POCKET-SIZED HELPER</div><h1>My <em>phone.</em></h1><p>Quick access to the places and tools you use around Maplewood.</p></div></div>
+        <div class="phone-layout"><div class="phone-device"><div class="phone-notch"></div><div class="phone-screen"><div class="phone-status"><span>9:41</span><span>●●● ▰</span></div><div class="phone-greeting">YOUR MAPLE LIFE</div><div class="phone-time" id="phoneTime">9:41</div><div class="phone-date" id="phoneDate">Day 1 · Maplewood</div><div class="phone-weather">🍁 <span><b id="phoneWeather">A fresh Canadian day</b><small>Maplewood, Canada</small></span></div><div class="phone-app-grid"><button data-phone-go="wallet"><span>💳</span>Bank</button><button data-phone-go="jobs"><span>💼</span>Jobs</button><button data-phone-go="city"><span>🗺️</span>Map</button><button data-phone-go="shop"><span>🛍️</span>Shop</button><button data-phone-go="home-life"><span>🏠</span>Home</button><button data-phone-go="home"><span>📊</span>Stats</button></div><div class="phone-reminder"><b>A little reminder ✨</b><p>Big things start with small steps. Make today count!</p></div></div></div><div class="phone-description"><span class="eyebrow">ALWAYS WITH YOU</span><h2>Everything at your fingertips.</h2><p>Check your balance, look for work, explore the city, or pick up something from the marketplace. Tap an app on your phone to jump straight there.</p><div class="phone-tip">📱 Your Maple Life progress is saved locally in this browser.</div></div></div>
       </section>
       <footer class="footer"><span>🍁 <strong>Maple Life</strong> <span class="footer-muted">· Your journey, your decisions.</span></span><span>Made for the love of Canadian life.</span></footer>
     </main>
