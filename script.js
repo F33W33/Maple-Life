@@ -4,13 +4,14 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const SAVE_KEY = "mapleLifeSaveV1";
   const initialState = {
-    name: "", avatar: "🧑🏽", cash: 1000, job: null, home: "starter",
+    name: "", avatar: "🧑🏽", province: "Saskatchewan", cash: 1000, job: null, home: "starter",
     day: 1, hunger: 82, energy: 90, happiness: 76, inventory: [],
     visited: [], rentPaid: false, tasks: []
   };
   let state = loadState();
   let toastTimer;
   let currentPlace = null;
+  let editingProfile = false;
 
   const jobs = {
     retail: { title: "Store Associate", wage: 18, place: "Maple Market" },
@@ -66,6 +67,7 @@
     const home = homes[state.home] || homes.starter;
     setText("#sideName", state.name || "New Resident");
     setText("#sideAvatar", state.avatar);
+    setText("#sideProvince", state.province || "Canada");
     setText("#topCash", money(state.cash));
     setText("#balanceStat", money(state.cash));
     setText("#jobsCash", money(state.cash));
@@ -100,6 +102,26 @@
     saveState();
     if (!state.name) $("#welcomeModal").classList.add("open");
     else $("#welcomeModal").classList.remove("open");
+  }
+
+  function openProfileEditor() {
+    editingProfile = true;
+    $("#playerName").value = state.name || "";
+    $("#playerProvince").value = state.province || "Saskatchewan";
+    const selectedAvatar = $('input[name="avatar"][value="' + (state.avatar || "🧑🏽") + '"]');
+    if (selectedAvatar) selectedAvatar.checked = true;
+    $("#profileEyebrow").textContent = "YOUR CHARACTER";
+    $("#profileModalTitle").textContent = "Edit your character.";
+    $("#profileModalDescription").textContent = "Update your name, avatar, or home province. Your game progress will stay the same.";
+    $("#profileSubmit").innerHTML = "Save character <span>→</span>";
+    $(".welcome-modal").classList.add("editing");
+    $("#welcomeModal").classList.add("open");
+  }
+  function closeProfileEditor() {
+    if (!state.name) return;
+    $("#welcomeModal").classList.remove("open");
+    $(".welcome-modal").classList.remove("editing");
+    editingProfile = false;
   }
   function seasonName() {
     const month = new Date().getMonth();
@@ -267,13 +289,19 @@
     if (!name) { toast("Please enter your name to begin."); return; }
     state.name = name;
     state.avatar = $('input[name="avatar"]:checked')?.value || "🧑🏽";
+    state.province = $("#playerProvince").value || "Saskatchewan";
+    const wasEditing = editingProfile;
+    editingProfile = false;
+    $(".welcome-modal").classList.remove("editing");
     render();
-    toast("Welcome to Maplewood, " + state.name + "! Your story starts now.");
+    toast(wasEditing ? "Character updated! Your progress is safe." : "Welcome to Maplewood, " + state.name + "! Your story starts now.");
   });
+  $("#editProfileButton").addEventListener("click", openProfileEditor);
+  $("#closeProfileModal").addEventListener("click", closeProfileEditor);
   $("#payRentButton").addEventListener("click", payRent);
   $("#closePlace").addEventListener("click", () => $("#placeModal").classList.remove("open"));
   $("#placeModal").addEventListener("click", event => { if (event.target === $("#placeModal")) $("#placeModal").classList.remove("open"); });
-  $("#welcomeModal").addEventListener("click", event => { if (event.target === $("#welcomeModal") && state.name) $("#welcomeModal").classList.remove("open"); });
+  $("#welcomeModal").addEventListener("click", event => { if (event.target === $("#welcomeModal")) closeProfileEditor(); });
   $("#resetButton").addEventListener("click", () => {
     if (!window.confirm("Start over? This will erase your Maple Life save on this device.")) return;
     state = { ...initialState };
@@ -291,7 +319,7 @@
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       $("#placeModal").classList.remove("open");
-      if (state.name) $("#welcomeModal").classList.remove("open");
+      if (state.name) closeProfileEditor();
     }
   });
   render();
