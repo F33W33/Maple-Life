@@ -273,18 +273,25 @@ const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
 let hoveredPlace=null,pointerX=0,pointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
 const canvas=renderer.domElement;
 canvas.style.cursor="crosshair";
-canvas.addEventListener("pointermove",e=>{
+// Track the pointer at window level so looking continues when it reaches the edge
+// of the 3D canvas. Clamp to the canvas bounds instead of resetting on pointerleave.
+window.addEventListener("pointermove",e=>{
  const rect=canvas.getBoundingClientRect();
  if(!rect.width||!rect.height)return;
  pointerX=T.MathUtils.clamp(((e.clientX-rect.left)/rect.width-.5)*2,-1,1);
  pointerY=T.MathUtils.clamp(((e.clientY-rect.top)/rect.height-.5)*2,-1,1);
- pointerNdc.set(pointerX,-pointerY);
- hoverRaycaster.setFromCamera(pointerNdc,camera);
- const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
- hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
- canvas.style.cursor=hoveredPlace?"pointer":"crosshair";
+ const inside=e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom;
+ if(inside){
+  pointerNdc.set(pointerX,-pointerY);
+  hoverRaycaster.setFromCamera(pointerNdc,camera);
+  const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
+  hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
+  canvas.style.cursor=hoveredPlace?"pointer":"crosshair";
+ }else{
+  hoveredPlace=null;
+ }
 });
-canvas.addEventListener("pointerleave",()=>{
+window.addEventListener("blur",()=>{
  pointerX=0;pointerY=0;hoveredPlace=null;canvas.style.cursor="crosshair";
 });
 
@@ -336,7 +343,7 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const lookAheadX=pointerX*125,lookAheadZ=pointerY*90;
+ const lookAheadX=pointerX*260,lookAheadZ=pointerY*190;
  viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);
  viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);
  const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
