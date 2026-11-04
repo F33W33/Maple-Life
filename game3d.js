@@ -73,16 +73,16 @@ function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,
 function slab(x,z,w,d,m,y=-.25,h=.5){return cube(world,x,y,z,w,h,d,m);}
 // Compact Saskatoon-inspired playable footprint: approximately 9 km x 6.5 km.
 // Buildings, roads, residents and vehicles retain their existing density.
-const WORLD_W=600,WORLD_D=620,UNIT_METRES=10;
+const WORLD_W=300,WORLD_D=310,UNIT_METRES=10;
 const terrain=slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);terrain.receiveShadow=true;
 const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
 // A dense 200-metre street grid with wider arterial roads every kilometre.
-for(let x=-280;x<=280;x+=20){
+for(let x=-130;x<=130;x+=20){
  const major=Math.abs(x%200)<.01;
  slab(x,0,major?3.2:1.35,WORLD_D-20,major?arterialRoad:localRoad,-.08,.18);
  if(major){slab(x-2.2,0,.45,WORLD_D-20,curb,.015,.1);slab(x+2.2,0,.45,WORLD_D-20,curb,.015,.1);}
 }
-for(let z=-300;z<=300;z+=20){
+for(let z=-140;z<=140;z+=20){
  const major=Math.abs(z%200)<.01;
  slab(0,z,WORLD_W-20,major?3.2:1.35,major?arterialRoad:localRoad,-.08,.18);
  if(major){slab(0,z-2.2,WORLD_W-20,.45,curb,.015,.1);slab(0,z+2.2,WORLD_W-20,.45,curb,.015,.1);}
@@ -93,7 +93,7 @@ slab(0,-13.2,WORLD_W,.65,M.waterLight,.03,.08);
 slab(0,13.2,WORLD_W,.65,M.waterLight,.03,.08);
 slab(0,-17,WORLD_W,3.5,M.path,.05,.15);
 slab(0,17,WORLD_W,3.5,M.path,.05,.15);
-for(const x of [-200,0,200]){
+for(const x of [-100,0,100]){
  slab(x,0,9,34,M.bridge,.18,.5);
  for(let z=-13;z<=13;z+=6)cube(world,x,.48,z,9.4,.12,.45,M.white);
 }
@@ -102,7 +102,7 @@ function park(x,z,w,d){
  slab(x,z,w*.7,.8,M.path,.02,.08);
  slab(x,z,w*.8,.8,M.path,.14,.12).rotation.y=Math.PI/2;
 }
-park(-210,180,65,55);park(205,190,65,55);park(-205,-205,65,55);
+park(-105,105,45,40);park(105,105,45,40);park(-105,-105,45,40);
 // Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  const g=new T.Group();g.position.set(x,0,z);world.add(g);
@@ -243,7 +243,10 @@ function landmarkDetails(p){
 }
 // Keep exactly ten visible buildings in this compact town.
 places.length=10;
+const compactBuildingPositions=[[-105,92],[-52,92],[0,92],[52,92],[105,92],[-105,-92],[-52,-92],[0,-92],[52,-92],[105,-92]];
 for(let i=0;i<10;i++){
+  places[i].x=compactBuildingPositions[i][0];
+  places[i].z=compactBuildingPositions[i][1];
  const p=places[i];
  const palette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1];
  building(p.x,p.z,10+(i%3)*2,9+(i%2)*2,6+(i%4)*1.5,palette[i%palette.length],0x625f5a,i%3===0?"heritage":"block");
@@ -294,16 +297,17 @@ function streetTree(x,z,scale=1){
 }
 // Exactly fifty trees, arranged in a compact 10-by-5 town grove.
 for(let i=0;i<50;i++){
- const x=((i%10)-4.5)*18;
- const z=(Math.floor(i/10)-2)*24;
+ const col=i%10,row=Math.floor(i/10);
+ const x=-128+col*(256/9)+(row%2?8:0);
+ const z=[-132,-82,-32,32,82][row];
  streetTree(x,z,.8);
 }
 // Pavement strips and dashed markings make the larger avenues read as streets.
 const sidewalkMat=mat(0xc9c6b8),markingMat=mat(0xe9e4ce);
-for(const x of [-200,0,200]){slab(x-3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);slab(x+3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);}
-for(const z of [-200,0,200]){slab(0,z-3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);slab(0,z+3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);}
-for(const x of [-200,0,200])for(let z=-290;z<290;z+=18)slab(x,z,.10,7,markingMat,.035,.035);
-for(const z of [-200,0,200])for(let x=-270;x<270;x+=18)slab(x,z,7,.10,markingMat,.035,.035);
+for(const x of [-100,0,100]){slab(x-3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);slab(x+3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);}
+for(const z of [-100,0,100]){slab(0,z-3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);slab(0,z+3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);}
+for(const x of [-100,0,100])for(let z=-140;z<140;z+=18)slab(x,z,.10,7,markingMat,.035,.035);
+for(const z of [-100,0,100])for(let x=-130;x<130;x+=18)slab(x,z,7,.10,markingMat,.035,.035);
 // Tiny residents walking along sidewalks and park paths; routes avoid the river channel.
 const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),mat(0xd1a34d),mat(0x53616c)];
 const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
@@ -316,7 +320,7 @@ function addPedestrian(x,z,index,dx,dz){
  const leftLeg=cube(g,-.13,.42,0,.18,.65,.2,pants),rightLeg=cube(g,.13,.42,0,.18,.65,.2,pants);
  pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx, dz});
 }
-const walkingRoutes=[[-8,-26,1,0],[-5,-26,1,0],[-2,-26,1,0],[5,-26,-1,0],[8,-26,-1,0],[-30,-26,0,1],[-30,-22,0,1],[-30,26,0,-1],[30,26,0,-1],[-48,24,1,0],[-44,24,1,0],[42,-26,-1,0],[46,-26,-1,0],[-180,120,1,0],[180,120,0,1],[150,-180,-1,0],[-180,-180,0,-1],[60,240,1,0],[-170,240,-1,0],[210,-120,0,1]];
+const walkingRoutes=[[-120,-120,1,0],[-60,-120,0,1],[0,-120,-1,0],[60,-120,0,1],[120,-120,-1,0],[-120,-60,0,1],[-60,-60,1,0],[0,-60,0,-1],[60,-60,-1,0],[120,-60,0,1],[-120,60,1,0],[-60,60,0,-1],[0,60,-1,0],[60,60,0,1],[120,60,-1,0],[-120,120,0,-1],[-60,120,1,0],[0,120,0,-1],[60,120,-1,0],[120,120,0,-1]];
 walkingRoutes.slice(0,20).forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
 // Colourful compact cars cruise the main roads in both directions.
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
@@ -328,7 +332,7 @@ function addCar(axis,fixed,position,direction,index){
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
  cars.push({group:g,axis,fixed:fixed+(direction>0?-.58:.58),position,direction,speed:2.2+(index%4)*.35});
 }
-for(let i=0;i<5;i++){const road=-200+i*100;addCar("z",road,-280+(i%3)*120,i%2?1:-1,i);}
+for(let i=0;i<5;i++){const road=-100+i*50;addCar("z",road,-140+(i%3)*70,i%2?1:-1,i);}
 
 // Player marker with simple blocky avatar
 const player={x:0,z:-112,yaw:0};const avatar=new T.Group();world.add(avatar);
@@ -417,8 +421,8 @@ function frame(t){
  if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;
  const len=Math.hypot(dx,dz);
  if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?.55:.22;
- player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-280,280);
- player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-300,300);walk+=dt*speed;
+ player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-140,140);
+ player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-145,145);walk+=dt*speed;
  player.yaw=Math.atan2(dx,dz);
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
@@ -446,7 +450,7 @@ function frame(t){
  }
  for(const car of cars){
   car.position+=car.direction*car.speed*dt;
-  if(car.position>300)car.position=-300;if(car.position< -300)car.position=300;
+  if(car.position>150)car.position=-150;if(car.position< -150)car.position=150;
   if(car.axis==="z"){car.group.position.set(car.fixed,0,car.position);car.group.rotation.y=car.direction>0?Math.PI:0;}
   else{car.group.position.set(car.position,0,car.fixed);car.group.rotation.y=car.direction>0?Math.PI/2:-Math.PI/2;}
  }
@@ -454,7 +458,7 @@ function frame(t){
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
- if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  TINY TOWN";
+ if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  TINY TOWN · QUARTER SIZE";
 
 }
 requestAnimationFrame(frame);
