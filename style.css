@@ -304,3 +304,13 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .life-sidebar-toggle{top:-12px!important;right:-10px!important}
 #mapleGame .life-sidebar.collapsed .life-sidebar-toggle{top:-12px!important;right:-10px!important}
 @media(max-width:760px){#mapleGame .game-date-pill{display:none}}
+
+
+/* Header layout inspired by the clean Maple Life reference: no duplicate top-right action buttons. */
+#mapleGame .game-topbar{position:relative;height:62px;flex-basis:62px;padding:7px 22px;justify-content:space-between;gap:14px}
+#mapleGame .game-brand{flex:0 0 auto;min-width:180px}
+#mapleGame .game-world-info{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);gap:8px}
+#mapleGame .game-date-pill{margin-left:auto;flex:0 0 auto;padding:9px 15px;background:#34445d;color:#fff;border:1px solid #4d5c72;border-radius:22px;box-shadow:0 3px 8px #1d2c4030;font-size:11px;font-weight:900;letter-spacing:.2px}
+#mapleGame .game-date-pill b{color:#fff}
+#mapleGame .game-tools{display:none!important}
+@media(max-width:760px){#mapleGame .game-topbar{height:58px;flex-basis:58px;padding:5px 9px;gap:5px}#mapleGame .game-brand{min-width:0}#mapleGame .game-world-info{position:static;transform:none;margin-left:auto;gap:4px}#mapleGame .game-date-pill{display:none!important}}
