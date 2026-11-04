@@ -336,7 +336,10 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const lookAheadX=pointerX*125,lookAheadZ=pointerY*90;\n viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);\n viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);\n const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
+ const lookAheadX=pointerX*125,lookAheadZ=pointerY*90;
+ viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);
+ viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);
+ const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
  camera.position.set(targetX+Math.sin(cameraAngle)*380,1000,targetZ+Math.cos(cameraAngle)*380);
  camera.lookAt(targetX,0,targetZ);
  for(const item of placeLabels){
