@@ -68,38 +68,40 @@ bridge:mat(0xb9b7a8),parking:mat(0x9da39b)
 const unit=new T.BoxGeometry(1,1,1);
 function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,y,z);o.scale.set(w,h,d);parent.add(o);return o;}
 function slab(x,z,w,d,m,y=-.25,h=.5){return cube(scene,x,y,z,w,h,d,m);}
-slab(0,0,260,190,M.land,-.6,1);
-// Neighbourhood grass blocks and road grid, in a rotated schematic city map
-const roadX=[-100,-68,-36,0,36,68,100],roadZ=[-72,-42,-12,18,48,78];
-for(const x of roadX){slab(x,0,7,185,M.road,-.08,.18);slab(x-4.1,0,1.1,185,M.roadEdge,-.03,.12);slab(x+4.1,0,1.1,185,M.roadEdge,-.03,.12);}
-for(const z of roadZ){slab(0,z,255,7,M.road,-.08,.18);slab(0,z-4.1,255,1.1,M.roadEdge,-.03,.12);slab(0,z+4.1,255,1.1,M.roadEdge,-.03,.12);}
-// Painted lane dividers, pedestrian crossings and sidewalks
-const lanePaint=mat(0xf5e9b9),crossPaint=mat(0xf7f4e8),sidewalk=mat(0xc9c5b3);
-for(const x of roadX){for(let z=-82;z<=82;z+=12)slab(x,z,.22,5.2,lanePaint,.045,.035);slab(x-5.2,0,1.1,185,sidewalk,.02,.12);slab(x+5.2,0,1.1,185,sidewalk,.02,.12);}
-for(const z of roadZ){for(let x=-118;x<=118;x+=12)slab(x,z,5.2,.22,lanePaint,.045,.035);slab(0,z-5.2,255,1.1,sidewalk,.02,.12);slab(0,z+5.2,255,1.1,sidewalk,.02,.12);}
-function crosswalk(x,z,vertical){for(let i=-3;i<=3;i++)slab(x+(vertical?i*1.05:0),z+(vertical?0:i*1.05),vertical?.62:7,vertical?7:.62,crossPaint,.06,.045);}
-for(const x of [-68,-36,0,36,68])for(const z of [-42,-12,18,48])crosswalk(x,z,true);
-for(const z of [-42,-12,18,48])for(const x of [-68,-36,0,36,68])crosswalk(x,z,false);
-// South Saskatchewan River runs through the centre of the map
-slab(0,0,260,25,M.water,-.05,.22);
-slab(0,-13.2,260,.65,M.waterLight,.03,.08);
-slab(0,13.2,260,.65,M.waterLight,.03,.08);
-// Riverbank walkways and green edges
-slab(0,-16.2,260,3.5,M.path,.05,.15);
-slab(0,16.2,260,3.5,M.path,.05,.15);
-// Three bridges across the river
-for(const x of [-78,0,78]){
- slab(x,0,8,33,M.bridge,.18,.5);
- for(let z=-13;z<=13;z+=6)cube(scene,x,.48,z,8.4,.12,.45,M.white);
+// Saskatoon-scale playable footprint: approximately 18 km x 13 km.
+// At 10 metres per world unit, the footprint represents about 234 km².
+const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=10;
+slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);
+const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
+// A dense 200-metre street grid with wider arterial roads every kilometre.
+for(let x=-880;x<=880;x+=20){
+ const major=Math.abs(x%200)<.01;
+ slab(x,0,major?3.2:1.35,WORLD_D-20,major?arterialRoad:localRoad,-.08,.18);
+ if(major){slab(x-2.2,0,.45,WORLD_D-20,curb,.015,.1);slab(x+2.2,0,.45,WORLD_D-20,curb,.015,.1);}
 }
-// Parks and green spaces
+for(let z=-630;z<=630;z+=20){
+ const major=Math.abs(z%200)<.01;
+ slab(0,z,WORLD_W-20,major?3.2:1.35,major?arterialRoad:localRoad,-.08,.18);
+ if(major){slab(0,z-2.2,WORLD_W-20,.45,curb,.015,.1);slab(0,z+2.2,WORLD_W-20,.45,curb,.015,.1);}
+}
+// South Saskatchewan River and its riverbank paths.
+slab(0,0,WORLD_W,25,M.water,-.04,.24);
+slab(0,-13.2,WORLD_W,.65,M.waterLight,.03,.08);
+slab(0,13.2,WORLD_W,.65,M.waterLight,.03,.08);
+slab(0,-17,WORLD_W,3.5,M.path,.05,.15);
+slab(0,17,WORLD_W,3.5,M.path,.05,.15);
+for(const x of [-200,0,200]){
+ slab(x,0,9,34,M.bridge,.18,.5);
+ for(let z=-13;z<=13;z+=6)cube(scene,x,.48,z,9.4,.12,.45,M.white);
+}
 function park(x,z,w,d){
  slab(x,z,w,d,M.grass2,-.02,.22);
  slab(x,z,w*.7,.8,M.path,.14,.12);
  slab(x,z,w*.8,.8,M.path,.14,.12).rotation.y=Math.PI/2;
 }
-park(-92,49,25,23);park(93,45,28,26);park(48,-49,27,24);park(-91,-47,28,25);
-park(12,49,28,22);park(-42,48,22,22);
+park(-350,220,85,75);park(370,180,95,82);park(190,-300,90,78);
+park(-360,-280,90,82);park(60,280,80,65);park(-170,300,75,70);
+park(610,420,110,95);park(-650,-420,115,90);
 // Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  const g=new T.Group();g.position.set(x,0,z);scene.add(g);
@@ -161,30 +163,86 @@ const places=[
 {id:"forestry",name:"Forestry Farm Park & Zoo",short:"Forestry Farm Zoo",x:100,z:80,emoji:"🦉",type:"park"},
 {id:"wanuskewin",name:"Wanuskewin Heritage Park",short:"Wanuskewin",x:-108,z:80,emoji:"🦬",type:"heritage"}
 ];
-// Build location-specific miniature models and labels
-for(const p of places){
- if(p.type==="park"){trees(p.x,p.z,5,10);label(p.short,p.x,p.z-8,p.emoji);continue;}
- if(p.type==="campus"){
-  building(p.x,p.z,17,12,8,0xd6d0bd,0x625c55,"heritage");
-  building(p.x-10,p.z-8,8,7,5,0xc7c1ad,0x5b5550);
-  building(p.x+11,p.z+7,9,8,6,0xd7d1c0,0x5a554e);
- }else if(p.type==="hospital"){
-  building(p.x,p.z,13,12,11,0xe4e3dc,0x5b6870,"tower");
-  cube(scene,p.x,p.z+6.1,p.z,0.1,.1,.1,M.white);
- }else if(p.type==="hotel"){
-  building(p.x,p.z,13,10,14,0xe0d3b7,0x496b59,"heritage");
- }else if(p.type==="museum"){
-  building(p.x,p.z,14,11,7,0xe8e5dc,0x474d55,"modern");
-  cube(scene,p.x,p.z+4,p.z,5,1,2,M.white);
- }else if(p.type==="shopping"||p.type==="market"){
-  building(p.x,p.z,19,14,6,0xe2e0d8,0x77736a,p.type==="shopping"?"modern":"block");
- }else if(p.type==="district"){
-  for(let i=0;i<5;i++)building(p.x+(i-2)*6,p.z+(i%2)*6,5,5,4+i%2,[0xd9b99a,0xc98f78,0xe2cda8,0xc4d1c4,0xd8b9a7][i],0x6c6259,"heritage");
- }else{
-  building(p.x,p.z,12,10,6,0xd8d1c2,0x65666a);
+for(const p of places){p.x*=4;p.z*=4;}
+places.push(
+ {id:"stonebridge",name:"Stonebridge",short:"Stonebridge",x:330,z:-430,emoji:"🏘",type:"neighbourhood"},
+ {id:"evergreen",name:"Evergreen",short:"Evergreen",x:650,z:480,emoji:"🌲",type:"neighbourhood"},
+ {id:"lawson",name:"Lawson Heights",short:"Lawson Heights",x:-650,z:430,emoji:"🏡",type:"neighbourhood"},
+ {id:"sutherland",name:"Sutherland",short:"Sutherland",x:570,z:80,emoji:"🏘",type:"neighbourhood"},
+ {id:"nutana",name:"Nutana",short:"Nutana",x:270,z:-150,emoji:"🏡",type:"neighbourhood"},
+ {id:"caswell",name:"Caswell Hill",short:"Caswell Hill",x:-270,z:160,emoji:"🏘",type:"neighbourhood"},
+ {id:"brighton",name:"Brighton",short:"Brighton",x:780,z:-300,emoji:"🏡",type:"neighbourhood"},
+ {id:"hampton",name:"Hampton Village",short:"Hampton Village",x:-760,z:-230,emoji:"🏘",type:"neighbourhood"}
+);
+// Distinctive landmark silhouettes inspired by Saskatoon's real buildings.
+function landmarkDetails(p){
+ const x=p.x,z=p.z;
+ if(p.id==="bessborough"){
+  building(x,z,18,15,16,0xd8c7a7,0x526c58,"heritage");
+  cube(scene,x,17.2,z,5,3,5,mat(0x53634f));
+  for(const [dx,dz] of [[-7,-5],[7,-5],[-7,5],[7,5]]){
+   cube(scene,x+dx,8,z+dz,3.2,16,3.2,mat(0xd9c8a8));
+   const roof=new T.Mesh(new T.ConeGeometry(2.6,5,4),mat(0x425a4b));roof.position.set(x+dx,18.5,z+dz);scene.add(roof);
+  }
+  for(let i=-2;i<=2;i++)cube(scene,x+i*3,11,z+7.65,1.2,5,.25,M.glass);
+  return;
  }
- if(p.type!=="park")trees(p.x-8,p.z+7,2,4);
- label(p.short,p.x,p.z-9,p.emoji);
+ if(p.id==="remai"){
+  const copper=mat(0x9a6245),copper2=mat(0xb87950);
+  cube(scene,x,3.2,z,25,6,18,copper);cube(scene,x+2,7.2,z-1,20,2,15,copper2);
+  cube(scene,x-2,9,z+1,15,2,12,copper);cube(scene,x,1.5,z+9.2,22,2.8,.35,M.glass);
+  cube(scene,x+12,4,z,1,8,17,M.glass);return;
+ }
+ if(p.id==="midtown"){
+  building(x,z,30,24,8,0xe1e0d8,0x777b7b,"modern");
+  cube(scene,x,9,z,12,3,10,M.glass);
+  for(let i=-2;i<=2;i++)cube(scene,x+i*5,3,z+12.2,3,3,.25,M.glass);
+  return;
+ }
+ if(p.id==="ru hospital"){
+  building(x,z,17,15,20,0xe8e8e1,0x657782,"tower");
+  building(x-10,z+9,10,10,10,0xd9e0df,0x647985,"modern");
+  cube(scene,x,22,z+7.8,4,2,.4,mat(0xb64c4c));cube(scene,x,22,z+7.8,.8,4,.45,M.white);return;
+ }
+ if(p.id==="university"){
+  building(x,z,20,15,8,0xc9c1ae,0x555b58,"heritage");
+  cube(scene,x,13,z,6,10,6,mat(0x777568));
+  const roof=new T.Mesh(new T.ConeGeometry(4.2,5,4),mat(0x46534c));roof.position.set(x,20,z);scene.add(roof);
+  for(let i=-3;i<=3;i++)cube(scene,x+i*2.5,5,z+7.7,1.1,4,.25,M.glass);return;
+ }
+ if(p.id==="diefenbaker"){
+  building(x,z,17,13,7,0xd8d2c2,0x66665f,"heritage");
+  for(let i=-3;i<=3;i++)cube(scene,x+i*2.2,4,z+6.7,.8,4,.2,M.glass);
+  cube(scene,x,8,z,6,1.2,5,mat(0x7b786c));return;
+ }
+ if(p.id==="farmers"){
+  building(x,z,21,16,5,0xd8d0b9,0x9a6749,"market");
+  const canopy=new T.Mesh(new T.ConeGeometry(12,4,4),mat(0x9b6849));canopy.rotation.y=Math.PI/4;canopy.position.set(x,8,z);scene.add(canopy);
+  for(let i=-3;i<=3;i++)cube(scene,x+i*2.5,2.7,z+8.2,1.2,4,.2,M.glass);return;
+ }
+ if(p.id==="westernmuseum"){
+  building(x,z,22,14,6,0xb99b75,0x5c5146,"heritage");cube(scene,x,7,z,7,3,15,mat(0x725d49));return;
+ }
+ if(p.type==="neighbourhood"){
+  const palette=[0xd9c5a7,0xc8d2c4,0xd9b7a5,0xc4cbd3,0xe3d8c2];
+  for(let i=0;i<5;i++)building(x+(i-2)*13,z+(i%2)*12,7+(i%3),6+(i%2),4+(i%3),palette[i],0x665c53,i%2?"heritage":"block");
+  return;
+ }
+ if(p.type==="park"){trees(x,z,7,18);return;}
+ if(p.type==="museum"){building(x,z,17,13,7,0xe5e2d8,0x515960,"modern");cube(scene,x,8,z,8,1.5,4,M.glass);return;}
+ if(p.type==="district"){
+  const colours=[0xd9b99a,0xc98f78,0xe2cda8,0xc4d1c4,0xd8b9a7];
+  for(let i=0;i<7;i++)building(x+(i-3)*8,z+(i%2)*9,6,6,4+i%3,colours[i%5],0x665d55,i%2?"heritage":"block");
+  return;
+ }
+ if(p.type==="hotel"){building(x,z,14,12,13,0xd9c8aa,0x536a58,"heritage");return;}
+ if(p.type==="shopping"){building(x,z,23,17,7,0xe3e0d7,0x77736a,"modern");return;}
+ building(x,z,12,10,6,0xd8d1c2,0x65666a,"block");
+}
+for(const p of places){
+ landmarkDetails(p);
+ if(p.type!=="park"&&p.type!=="neighbourhood")trees(p.x-22,p.z+20,3,8);
+ label(p.short,p.x,p.z-24,p.emoji);
 }
 // Local street boards along main roads
 function roadSign(x,z,txt){
@@ -198,7 +256,7 @@ function roadSign(x,z,txt){
 roadSign(-46,-34,"DOWNTOWN");roadSign(56,-34,"BROADWAY");roadSign(-49,35,"UNIVERSITY");
 trees(-50,64,7,14);trees(54,46,7,14);trees(-92,8,7,12);trees(94,-8,7,12);
 // Player marker with simple blocky avatar
-const player={x:0,z:-28,yaw:0};const avatar=new T.Group();scene.add(avatar);
+const player={x:0,z:-112,yaw:0};const avatar=new T.Group();scene.add(avatar);
 cube(avatar,0,1,0,1,1.2,.65,mat(0x368dc4));
 cube(avatar,0,1.95,0,.78,.75,.7,mat(0xc9906d));
 cube(avatar,0,2.35,0,.8,.2,.72,mat(0x302b29));
@@ -208,7 +266,7 @@ const placeLabels=[],placeHitAreas=[];
 for(const p of places){
  const labelSprite=scene.children.find(o=>o.isSprite && o.position.x===p.x && (o.position.z===p.z-9||o.position.z===p.z-8));
  if(labelSprite){labelSprite.material.opacity=0;labelSprite.material.transparent=true;labelSprite.scale.set(0,0,1);placeLabels.push({place:p,sprite:labelSprite,active:false});}
- const hit=new T.Mesh(new T.PlaneGeometry(22,20),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));
+ const hit=new T.Mesh(new T.PlaneGeometry(48,42),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));
  hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;scene.add(hit);placeHitAreas.push(hit);
 }
 const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
@@ -226,7 +284,7 @@ canvas.addEventListener("pointermove",e=>{
  if(dragging){
   const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;
   if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;
-  const scale=104/Math.max(1,rect.height)/Math.max(.65,camera.zoom);
+  const scale=260/Math.max(1,rect.height)/Math.max(.65,camera.zoom);
   viewOffsetX+=dx*scale;viewOffsetZ-=dy*scale;
   lastPointerX=e.clientX;lastPointerY=e.clientY;
   hoveredPlace=null;canvas.style.cursor="grabbing";
@@ -245,7 +303,7 @@ canvas.addEventListener("pointerleave",e=>{if(!dragging)hoveredPlace=null;});
 function resize(){
  const r=host.getBoundingClientRect();if(!r.width||!r.height)return;
  renderer.setSize(r.width,r.height,false);
- const aspect=r.width/r.height,viewH=104;
+ const aspect=r.width/r.height,viewH=260;
  camera.left=-viewH*aspect/2;camera.right=viewH*aspect/2;
  camera.top=viewH/2;camera.bottom=-viewH/2;camera.updateProjectionMatrix();
 }
@@ -253,7 +311,7 @@ new ResizeObserver(resize).observe(host);resize();
 function nearest(){
  let best=null,d=1e9;
  for(const p of places){const n=Math.hypot(player.x-p.x,player.z-p.z);if(n<d){d=n;best=p;}}
- return d<15?best:null;
+ return d<5?best:null;
 }
 function interact(){
  const p=nearest();
@@ -283,15 +341,15 @@ function frame(t){
  let dx=0,dz=0;if(keys.KeyW||keys.ArrowUp)dz-=1;if(keys.KeyS||keys.ArrowDown)dz+=1;
  if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;
  const len=Math.hypot(dx,dz);
- if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?12:7;
- player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-124,124);
- player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-88,88);walk+=dt*speed;
+ if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?2.2:1.2;
+ player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-880,880);
+ player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-630,630);walk+=dt*speed;
  player.yaw=Math.atan2(dx,dz);
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
  const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
- camera.position.set(targetX+Math.sin(cameraAngle)*38,100,targetZ+Math.cos(cameraAngle)*38);
+ camera.position.set(targetX+Math.sin(cameraAngle)*380,1000,targetZ+Math.cos(cameraAngle)*380);
  camera.lookAt(targetX,0,targetZ);
  for(const item of placeLabels){
   const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
@@ -299,16 +357,16 @@ function frame(t){
   const target=active?1:0;
   const current=item.sprite.material.opacity;
   item.sprite.material.opacity+= (target-current)*Math.min(1,dt*12);
-  const scale=17*item.sprite.material.opacity;
-  item.sprite.scale.set(scale,4.25*item.sprite.material.opacity,1);
-  if(active){item.sprite.position.y=7.2+Math.sin(t*.006)*.42;}
-  else item.sprite.position.y=7;
+  const scale=38*item.sprite.material.opacity;
+  item.sprite.scale.set(scale,9.5*item.sprite.material.opacity,1);
+  if(active){item.sprite.position.y=26+Math.sin(t*.006)*1.2;}
+  else item.sprite.position.y=24;
  }
  renderer.render(scene,camera);
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
- if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN");
+ if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  CITY MAP ~18 × 13 KM";
 
 }
 requestAnimationFrame(frame);
