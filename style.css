@@ -220,7 +220,6 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 
 /* Collapsible in-game navigation */
 #mapleGame .life-sidebar{position:absolute;z-index:30;left:16px;top:50%;transform:translateY(-50%);width:202px;max-height:calc(100% - 36px);overflow:visible;display:flex;flex-direction:column;gap:5px;padding:15px 12px 13px;background:rgba(250,252,247,.96);border:1px solid #e1eadb;border-radius:22px;box-shadow:0 10px 35px #1d38252b;backdrop-filter:blur(14px);transition:width .22s,padding .22s}
-#mapleGame .life-sidebar-toggle{position:absolute;right:-15px;top:16px;width:30px;height:30px;border:2px solid #fff;border-radius:50%;background:#6544df;color:white;font-size:23px;line-height:20px;box-shadow:0 3px 9px #192b2540;cursor:pointer}
 #mapleGame .life-sidebar-brand{display:flex;align-items:center;gap:9px;padding:2px 7px 12px;color:#263c2e;font-size:12px;letter-spacing:1px}
 #mapleGame .life-sidebar-brand span{font-size:24px}
 #mapleGame .life-sidebar-label{padding:8px 9px 5px;color:#8a9988;font-size:8px;font-weight:900;letter-spacing:1.3px}
@@ -237,7 +236,6 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .life-sidebar.collapsed .life-sidebar-brand{justify-content:center;padding:0 0 8px}
 #mapleGame .life-sidebar.collapsed .life-menu-item{justify-content:center;padding:8px 0}
 #mapleGame .life-sidebar.collapsed .life-menu-item span{font-size:22px}
-#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-13px}
 #mapleGame .game-hotbar{display:none}
 #mapleGame .game-objectives{left:232px}
 #mapleGame .game-minimap{left:232px}
@@ -272,9 +270,7 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .life-sidebar.collapsed .life-sidebar-brand{justify-content:center;padding:0 0 8px}
 #mapleGame .life-sidebar.collapsed .life-menu-item{justify-content:center;padding:8px 0}
 #mapleGame .life-sidebar.collapsed .life-menu-item span{font-size:22px;transition:transform .3s ease}
-#mapleGame .life-sidebar-toggle{z-index:2;pointer-events:auto;touch-action:manipulation;transition:transform .35s cubic-bezier(.22,1,.36,1),background .2s ease}
 #mapleGame .life-sidebar-toggle:hover{transform:scale(1.1)}
-#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-13px}
 #mapleGame #maple3d,#mapleGame #maple3d canvas{cursor:grab;touch-action:none}
 #mapleGame #maple3d canvas:active{cursor:grabbing}
 @media(max-width:760px){
@@ -285,24 +281,14 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 /* Cursor-directed camera and a crisp, centered sidebar chevron */
 #mapleGame #maple3d,#mapleGame #maple3d canvas{cursor:crosshair!important;touch-action:pan-y}
 #mapleGame #maple3d canvas:active{cursor:crosshair!important}
-#mapleGame .life-sidebar-toggle{
- display:grid;place-items:center;padding:0;line-height:1;font-size:0;
- width:30px;height:30px;right:-15px;top:16px;
-}
 #mapleGame .life-sidebar-toggle::before{
  content:"";display:block;width:8px;height:8px;
  border-top:2.5px solid currentColor;border-right:2.5px solid currentColor;
  transform:rotate(45deg);transition:transform .28s ease;
 }
 #mapleGame .life-sidebar:not(.collapsed) .life-sidebar-toggle::before{transform:rotate(225deg)}
-#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-15px}
-#mapleGame .life-sidebar-toggle:focus-visible{outline:3px solid #b9adff;outline-offset:3px}
-
-
 /* Keep the in-game clock separate from the topbar's Maplewood day counter. */
 #mapleGame .game-date-pill{position:relative;inset:auto;z-index:auto;display:flex;align-items:center;white-space:nowrap}
-#mapleGame .life-sidebar-toggle{top:-12px!important;right:-10px!important}
-#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{top:-12px!important;right:-10px!important}
 @media(max-width:760px){#mapleGame .game-date-pill{display:none}}
 
 
