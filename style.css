@@ -411,3 +411,40 @@ body.auth-complete #characterScreen{display:none!important;visibility:hidden!imp
   text-indent:0!important;
   box-sizing:border-box!important;
 }
+
+/* Keep all avatar choices inside the character/profile panel on narrow phone layouts. */
+#welcomeModal .avatar-choices{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  justify-items:stretch!important;
+  align-items:center;
+  gap:8px!important;
+  width:100%;
+  min-width:0;
+}
+#welcomeModal .avatar-choices label{
+  display:block;
+  min-width:0;
+  width:100%;
+}
+#welcomeModal .avatar-choices span{
+  box-sizing:border-box;
+  width:100%!important;
+  max-width:48px;
+  aspect-ratio:1;
+  height:auto!important;
+  margin:0 auto;
+  font-size:clamp(18px,5vw,23px);
+}
+#welcomeModal .welcome-modal{
+  box-sizing:border-box;
+  width:min(430px,calc(100vw - 28px));
+  max-width:calc(100vw - 28px);
+  max-height:calc(100dvh - 28px);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+@media(max-width:420px){
+  #welcomeModal .avatar-choices{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
+  #welcomeModal .welcome-modal{padding:25px 20px}
+}
