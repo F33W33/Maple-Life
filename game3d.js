@@ -266,6 +266,49 @@ function roadSign(x,z,txt){
 }
 roadSign(-46,-34,"DOWNTOWN");roadSign(56,-34,"BROADWAY");roadSign(-49,35,"UNIVERSITY");
 trees(-50,64,7,14);trees(54,46,7,14);trees(-92,8,7,12);trees(94,-8,7,12);
+// Living streets: leafy parks, tiny pedestrians and moving traffic.
+const iTreeMats=[mat(0x398653),mat(0x579c5d),mat(0x78ad68),mat(0x2f754c)];
+function streetTree(x,z,scale=1){
+ const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
+ const trunk=new T.Mesh(new T.CylinderGeometry(.12,.18,1.15,6),M.trunk);trunk.position.y=.58;trunk.castShadow=true;g.add(trunk);
+ const crown=new T.Mesh(new T.IcosahedronGeometry(.95,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=1.72;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
+ const crown2=new T.Mesh(new T.IcosahedronGeometry(.66,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.38,2.05,.12);crown2.castShadow=true;g.add(crown2);
+}
+for(const [x,z,n] of [[-350,220,22],[370,180,25],[190,-300,20],[-360,-280,22],[60,280,18],[-170,300,18],[610,420,28],[-650,-420,28],[-50,64,10],[54,46,10],[-92,8,10],[94,-8,10]]){
+ for(let i=0;i<n;i++){const a=i*2.399963,rad=4+Math.sqrt(i)*2.2;streetTree(x+Math.cos(a)*rad,z+Math.sin(a)*rad,.72+(i%4)*.1);}
+}
+// Pavement strips and dashed markings make the larger avenues read as streets.
+const sidewalkMat=mat(0xc9c6b8),markingMat=mat(0xe9e4ce);
+for(const x of [-400,-200,0,200,400]){slab(x-3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);slab(x+3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);}
+for(const z of [-400,-200,0,200,400]){slab(0,z-3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);slab(0,z+3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);}
+for(const x of [-800,-600,-400,-200,0,200,400,600,800])for(let z=-620;z<620;z+=18)slab(x,z,.10,7,markingMat,.035,.035);
+for(const z of [-600,-400,-200,0,200,400,600])for(let x=-870;x<870;x+=18)slab(x,z,7,.10,markingMat,.035,.035);
+// Tiny residents walking along sidewalks and park paths.
+const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),mat(0xd1a34d),mat(0x53616c)];
+const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
+const pedestrians=[];
+function addPedestrian(x,z,index,dx,dz){
+ const g=new T.Group();g.position.set(x,0,z);g.rotation.y=Math.atan2(dx,dz);scene.add(g);
+ const shirt=pedestrianMats[index%pedestrianMats.length],skin=skinMats[index%skinMats.length],pants=mat(index%2?0x39475c:0x45413b);
+ cube(g,0,1.05,0,.48,.68,.28,shirt);cube(g,0,1.62,0,.34,.38,.34,skin);cube(g,0,1.82,-.015,.35,.12,.35,mat(0x40352f));
+ const leftArm=cube(g,-.31,1.05,0,.16,.56,.17,shirt),rightArm=cube(g,.31,1.05,0,.16,.56,.17,shirt);
+ const leftLeg=cube(g,-.13,.42,0,.18,.65,.2,pants),rightLeg=cube(g,.13,.42,0,.18,.65,.2,pants);
+ pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx, dz});
+}
+const walkingRoutes=[[-8,-26,1,0],[-5,-26,1,0],[-2,-26,1,0],[5,-26,-1,0],[8,-26,-1,0],[-30,-8,0,1],[-30,-5,0,1],[-30,5,0,-1],[30,8,0,-1],[-48,20,1,0],[-44,20,1,0],[42,-22,-1,0],[46,-22,-1,0],[-350,220,1,0],[370,180,0,1],[190,-300,-1,0],[-360,-280,0,-1],[60,280,1,0],[-170,300,-1,0],[610,420,0,1],[-650,-420,1,0]];
+walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
+// Colourful compact cars cruise the main roads in both directions.
+const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
+const carWindow=new T.MeshStandardMaterial({color:0x9dcbd3,roughness:.22,metalness:.12});
+function addCar(axis,fixed,position,direction,index){
+ const g=new T.Group();scene.add(g);const paint=mat(carPaint[index%carPaint.length]);
+ cube(g,0,.52,0,1.25,.62,2.35,paint);cube(g,0,.98,-.12,.98,.55,1.18,carWindow);cube(g,0,.92,.83,1.05,.24,.42,paint);
+ for(const side of [-1,1])for(const end of [-.72,.72]){const wheel=new T.Mesh(new T.CylinderGeometry(.24,.24,.16,10),tireMat);wheel.rotation.z=Math.PI/2;wheel.position.set(side*.66,.27,end);wheel.castShadow=true;g.add(wheel);}
+ for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
+ cars.push({group:g,axis,fixed,position,direction,speed:.75+(index%4)*.16});
+}
+for(let i=0;i<8;i++){const road=-600+i*200;addCar("z",road,-610+(i%3)*150,i%2?1:-1,i);addCar("x",road,-820+(i%4)*360,i%2?-1:1,i+2);}
+
 // Player marker with simple blocky avatar
 const player={x:0,z:-112,yaw:0};const avatar=new T.Group();scene.add(avatar);
 cube(avatar,0,1,0,1,1.2,.65,mat(0x368dc4));
@@ -368,6 +411,19 @@ function frame(t){
   item.sprite.scale.set(scale,9.5*item.sprite.material.opacity,1);
   if(active){item.sprite.position.y=32+Math.sin(t*.006)*1.2;}
   else item.sprite.position.y=29;
+ }
+ // Animate the residents and traffic independently of player movement.
+ for(const p of pedestrians){
+  p.phase+=dt*5.2;p.group.position.x+=p.dx*dt*60;p.group.position.z+=p.dz*dt*60;
+  if(Math.hypot(p.group.position.x-p.homeX,p.group.position.z-p.homeZ)>13){p.dx*=-1;p.dz*=-1;p.group.rotation.y=Math.atan2(p.dx,p.dz);}
+  const swing=Math.sin(p.phase)*.32;p.leftLeg.rotation.x=swing;p.rightLeg.rotation.x=-swing;p.leftArm.rotation.x=-swing*.7;p.rightArm.rotation.x=swing*.7;
+  p.group.position.y=Math.abs(Math.sin(p.phase*2))*.025;
+ }
+ for(const car of cars){
+  car.position+=car.direction*car.speed*dt;
+  if(car.position>900)car.position=-900;if(car.position< -900)car.position=900;
+  if(car.axis==="z"){car.group.position.set(car.fixed,0,car.position);car.group.rotation.y=car.direction>0?Math.PI:0;}
+  else{car.group.position.set(car.position,0,car.fixed);car.group.rotation.y=car.direction>0?Math.PI/2:-Math.PI/2;}
  }
  renderer.render(scene,camera);
  const near=nearest(),hint=document.getElementById("gameInteract");
