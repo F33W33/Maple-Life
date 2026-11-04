@@ -400,3 +400,14 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 body.auth-complete #mapleGame{display:flex!important;visibility:visible!important;opacity:1!important}
 body.auth-complete #authScreen,
 body.auth-complete #characterScreen{display:none!important;visibility:hidden!important}
+
+/* Precisely center the phone close glyph inside its green circular button. */
+#mapleGame .phone-heading .phone-close{
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  line-height:1!important;
+  text-align:center!important;
+  text-indent:0!important;
+  box-sizing:border-box!important;
+}
