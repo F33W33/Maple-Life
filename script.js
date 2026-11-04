@@ -335,6 +335,9 @@
     }else if(type==="profile"){
       title="⚙️ Settings & profile";subtitle="YOUR ACCOUNT";
       body='<div class="phone-profile"><span>'+(state.avatar||"🙂")+'</span><b>'+(state.name||"New Resident")+'</b><small>'+(state.province||"Saskatchewan")+'</small></div>'+go("Edit character","profile-edit")+'<p class="phone-note">Settings and character options will live here.</p>';
+    }else if(type==="settings"){
+      title="⚙️ Settings";subtitle="YOUR PREFERENCES";
+      body=go("Edit character profile","profile-edit") + '<div class="phone-feature"><span>🍁</span><b>Maple Life settings</b><small>Personalize your resident profile and game preferences.</small></div>';
     }else if(type==="map"){
       title="📍 City map";subtitle="EXPLORE MAPLEWOOD";
       body='<div class="phone-feature"><span>🏙️</span><b>Maplewood, Saskatchewan</b><small>Explore neighbourhoods, parks, shops and community places.</small></div>'+go("Open city view","city");
@@ -346,7 +349,7 @@
       body='<div class="phone-quest"><span>'+(state.job?"✓":"1")+'</span><div><b>Find a job</b><small>'+(state.job?"You have a job!":"Start earning your own money")+'</small></div></div><div class="phone-quest"><span>'+(state.visited.includes("square")?"✓":"2")+'</span><div><b>Explore downtown</b><small>'+(state.visited.includes("square")?"City Square visited":"Visit City Square")+'</small></div></div><div class="phone-quest"><span>'+(state.home!=="starter"?"✓":"3")+'</span><div><b>Settle into your home</b><small>'+(state.home!=="starter"?"You found a new home":"Make your place feel like yours")+'</small></div></div>'+go("View your progress","home");
     }else{
       title=type==="phone"?"📱 My phone":"🏠 Home";subtitle="MAPLE LIFE APPS";
-      body='<div class="phone-profile compact"><span>'+(state.avatar||"🙂")+'</span><div><b>'+(state.name||"New Resident")+'</b><small>Maplewood resident</small></div><strong>'+money(state.cash)+'</strong></div><div class="phone-app-grid">'+button("🎒<b>Inventory</b>","inventory")+button("📍<b>City map</b>","map")+button("🛍️<b>Marketplace</b>","shop")+button("🏆<b>Quests</b>","quests")+button("💼<b>Careers</b>","jobs")+button("🏡<b>My home</b>","home-life")+'</div>';
+      body='<div class="phone-profile compact"><span>'+(state.avatar||"🙂")+'</span><div><b>'+(state.name||"New Resident")+'</b><small>Maplewood resident</small></div><strong>'+money(state.cash)+'</strong></div><div class="phone-app-grid">'+button("🎒<b>Inventory</b>","inventory")+button("📍<b>City map</b>","map")+button("🛍️<b>Marketplace</b>","shop")+button("🏆<b>Quests</b>","quests")+button("💼<b>Careers</b>","jobs")+button("🏡<b>My home</b>","home-life")+button("⚙️<b>Settings</b>","settings")+'</div>';
     }
     content.innerHTML='<div class="phone-shell"><div class="phone-speaker"></div><div class="phone-status"><span>🍁 MAPLE LIFE</span><span>● ● ●</span></div><div class="phone-heading"><div><small>'+subtitle+'</small><h2>'+title+'</h2></div><button class="phone-close" id="phoneClose" aria-label="Close phone">×</button></div><div class="phone-screen-content">'+body+'</div><div class="phone-nav"><span>⌂<small>HOME</small></span><span>▦<small>APPS</small></span><span>●<small>YOU</small></span></div></div>';
     panel.classList.add("open");
