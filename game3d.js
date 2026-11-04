@@ -334,6 +334,7 @@ window.addEventListener("pointermove",e=>{
  if(!rect.width||!rect.height)return;
  pointerX=T.MathUtils.clamp(((e.clientX-rect.left)/rect.width-.5)*2,-1,1);
  pointerY=T.MathUtils.clamp(((e.clientY-rect.top)/rect.height-.5)*2,-1,1);
+ if(Math.abs(pointerX)>.08||Math.abs(pointerY)>.08)document.getElementById("gameCursorHint")?.classList.add("is-hidden");
  const inside=e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom;
  if(inside){
   pointerNdc.set(pointerX,-pointerY);
