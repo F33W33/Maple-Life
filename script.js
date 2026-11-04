@@ -345,7 +345,6 @@
   const lifeSidebar=$("#lifeSidebar"),lifeSidebarToggle=$("#lifeSidebarToggle");
   lifeSidebarToggle?.addEventListener("click",()=>{
     const collapsed=lifeSidebar.classList.toggle("collapsed");
-    lifeSidebarToggle.textContent=collapsed?"›":"‹";
     lifeSidebarToggle.setAttribute("aria-expanded",String(!collapsed));
     lifeSidebarToggle.setAttribute("aria-label",collapsed?"Expand menu":"Collapse menu");
   });
