@@ -210,3 +210,9 @@ body.auth-complete #authScreen{display:none}
 .auth-footer{margin-top:22px;color:#9ba797;font-size:8px;font-weight:900;letter-spacing:1.4px}.auth-footer span{padding:0 6px}
 @media(max-width:850px){.auth-screen{grid-template-columns:1fr}.auth-scene{min-height:36vh;padding:20px 25px}.auth-scene-copy{padding:32px 0 65px}.auth-scene-copy h1{font-size:48px;letter-spacing:-2px;margin:12px 0}.auth-scene-copy p{font-size:11px;max-width:330px}.auth-scene-tags{margin-top:16px}.auth-scene-tags span{padding:7px 10px;font-size:8px}.auth-skyline{bottom:12%;right:8%;font-size:32px}.auth-scene-bottom{font-size:7px}.auth-card-wrap{padding:28px 20px}.auth-card{max-width:430px}.auth-card-leaf{margin-bottom:15px}}
 @media(max-width:430px){.auth-scene{min-height:33vh;padding:16px 18px}.auth-scene-top{font-size:9px}.auth-live{font-size:6px;padding:7px}.auth-scene-copy h1{font-size:39px}.auth-scene-copy p{max-width:260px}.auth-skyline{font-size:27px;gap:4px}.auth-card-wrap{padding:20px 14px}.auth-card{padding:24px 20px;border-radius:20px}.auth-card h2{font-size:27px}}
+
+/* Native hash navigation fallback for entering the game */
+#mapleGame:target{display:flex!important}
+body:has(#mapleGame:target) #authScreen{display:none!important}
+.auth-primary,.auth-secondary{text-decoration:none;box-sizing:border-box}
+.auth-secondary{text-align:center}
