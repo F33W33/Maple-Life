@@ -69,9 +69,9 @@ bridge:mat(0xb9b7a8),parking:mat(0x9da39b)
 const unit=new T.BoxGeometry(1,1,1);
 function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
 function slab(x,z,w,d,m,y=-.25,h=.5){return cube(scene,x,y,z,w,h,d,m);}
-// Saskatoon-scale playable footprint: approximately 18 km x 13 km.
-// At 10 metres per world unit, the footprint represents about 234 km².
-const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=10;
+// Compact Saskatoon-inspired playable footprint: approximately 9 km x 6.5 km.
+// Buildings, roads, residents and vehicles retain their existing density.
+const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=5;
 const terrain=slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);terrain.receiveShadow=true;
 const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
 // A dense 200-metre street grid with wider arterial roads every kilometre.
@@ -307,7 +307,7 @@ for(const x of [-400,-200,0,200,400]){slab(x-3.1,0,.8,WORLD_D-30,sidewalkMat,-.0
 for(const z of [-400,-200,0,200,400]){slab(0,z-3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);slab(0,z+3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);}
 for(const x of [-800,-600,-400,-200,0,200,400,600,800])for(let z=-620;z<620;z+=18)slab(x,z,.10,7,markingMat,.035,.035);
 for(const z of [-600,-400,-200,0,200,400,600])for(let x=-870;x<870;x+=18)slab(x,z,7,.10,markingMat,.035,.035);
-// Tiny residents walking along sidewalks and park paths.
+// Tiny residents walking along sidewalks and park paths; routes avoid the river channel.
 const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),mat(0xd1a34d),mat(0x53616c)];
 const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
 const pedestrians=[];
@@ -319,7 +319,7 @@ function addPedestrian(x,z,index,dx,dz){
  const leftLeg=cube(g,-.13,.42,0,.18,.65,.2,pants),rightLeg=cube(g,.13,.42,0,.18,.65,.2,pants);
  pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx, dz});
 }
-const walkingRoutes=[[-8,-26,1,0],[-5,-26,1,0],[-2,-26,1,0],[5,-26,-1,0],[8,-26,-1,0],[-30,-8,0,1],[-30,-5,0,1],[-30,5,0,-1],[30,8,0,-1],[-48,20,1,0],[-44,20,1,0],[42,-22,-1,0],[46,-22,-1,0],[-350,220,1,0],[370,180,0,1],[190,-300,-1,0],[-360,-280,0,-1],[60,280,1,0],[-170,300,-1,0],[610,420,0,1],[-650,-420,1,0]];
+const walkingRoutes=[[-8,-26,1,0],[-5,-26,1,0],[-2,-26,1,0],[5,-26,-1,0],[8,-26,-1,0],[-30,-26,0,1],[-30,-22,0,1],[-30,26,0,-1],[30,26,0,-1],[-48,24,1,0],[-44,24,1,0],[42,-26,-1,0],[46,-26,-1,0],[-350,220,1,0],[370,180,0,1],[190,-300,-1,0],[-360,-280,0,-1],[60,280,1,0],[-170,300,-1,0],[610,420,0,1],[-650,-420,1,0]];
 walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
 // Colourful compact cars cruise the main roads in both directions.
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
