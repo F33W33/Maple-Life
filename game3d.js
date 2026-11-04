@@ -31,7 +31,7 @@ function solarElevation(date){
  const gamma=2*Math.PI/365*(dayOfYear-1+(hour-12)/24);
  const eq=229.18*(0.000075+0.001868*Math.cos(gamma)-0.032077*Math.sin(gamma)-0.014615*Math.cos(2*gamma)-0.040849*Math.sin(2*gamma));
  const decl=0.006918-0.399912*Math.cos(gamma)+0.070257*Math.sin(gamma)-0.006758*Math.cos(2*gamma)+0.000907*Math.sin(2*gamma)-0.002697*Math.cos(3*gamma)+0.00148*Math.sin(3*gamma);
- const solarMinutes=hour*60+eq+4*(-106.67)-0;
+ const solarMinutes=hour*60+eq+4*(-106.67)+360;
  const ha=(solarMinutes/4-180)*Math.PI/180,lat=52.1332*Math.PI/180;
  return Math.asin(Math.sin(lat)*Math.sin(decl)+Math.cos(lat)*Math.cos(decl)*Math.cos(ha))*180/Math.PI;
 }
