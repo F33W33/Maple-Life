@@ -41,25 +41,9 @@
 <div id="mapleGame" class="maple-game">
 <header class="game-topbar"><div class="game-brand"><span class="game-leaf">🍁</span><span><b>Maple Life</b><small>LIVE. WORK. EXPLORE.</small></span></div><div class="game-world-info"><div class="game-pill">💵 <b id="gameCash">$1,000</b></div><div class="game-pill province-pill">🍁 <b id="gameProvince">Saskatchewan</b></div></div><div class="game-pill game-date-pill">🍁 <b id="gameDate">MAPLEWOOD · DAY 1</b></div></header>
 <main class="game-world"><div id="maple3d" aria-label="3D Maplewood city. Use WASD or arrow keys to move."></div>
-<div class="life-sidebar collapsed" id="lifeSidebar">
-  <div class="life-sidebar-brand"><span>🍁</span><b>MAPLE LIFE</b></div>
-  <div class="life-sidebar-label">YOUR WORLD</div>
-  <button class="life-menu-item active" data-phone-screen="home"><span>🏠</span><b>Home</b></button>
-  <button class="life-menu-item" data-phone-screen="inventory"><span>🎒</span><b>Inventory</b></button>
-  <button class="life-menu-item" data-phone-screen="phone"><span>📱</span><b>Phone</b></button>
-  <button class="life-menu-item" data-phone-screen="map"><span>📍</span><b>Map</b></button>
-  <button class="life-menu-item" data-phone-screen="shop"><span>🛍️</span><b>Shop</b></button>
-  <button class="life-menu-item" data-phone-screen="quests"><span>🏆</span><b>Quests</b></button>
-  <div class="life-sidebar-spacer"></div>
-  <button class="life-menu-item" data-sidebar-settings><span>⚙️</span><b>Settings & profile</b></button>
-  <div class="life-sidebar-hotbar">
-    <div class="life-sidebar-label">QUICK ACTIONS</div>
-    <div class="life-quick-grid">
-      <button data-hotbar="eat" title="Eat">🍔</button><button data-hotbar="coffee" title="Drink">🧃</button>
-      <button data-hotbar="rest" title="Rest">🛏️</button><button data-hotbar="inventory" title="Bag">🎒</button>
-    </div>
-  </div>
-</div><div class="game-clock" id="gameClock" aria-live="off">☀️ --:-- · DAYTIME</div><div class="game-location" id="gameLocation">📍 MAPLEWOOD DOWNTOWN</div><div class="game-interact" id="gameInteract"></div><div class="game-controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE · <kbd>E</kbd> INTERACT · MOVE CURSOR TO LOOK</div><div class="game-touch-controls"><button data-move="up">▲</button><div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div></div><div class="game-hotbar"><button data-hotbar="phone"><span>📱</span><small>1</small></button><button data-hotbar="eat"><span>🍔</span><small>2</small></button><button data-hotbar="coffee"><span>🧃</span><small>3</small></button><button data-hotbar="rest"><span>🛏️</span><small>4</small></button><button data-hotbar="inventory"><span>🎒</span><small>5</small></button></div><aside class="game-needs"><div class="game-need"><span>😊</span><div><b>Happiness</b><i><em id="gameHappyBar" style="width:76%"></em></i></div><strong id="gameHappyValue">76%</strong></div><div class="game-need"><span>🍽️</span><div><b>Hunger</b><i><em id="gameHungerBar" style="width:82%"></em></i></div><strong id="gameHungerValue">82%</strong></div><div class="game-need"><span>⚡</span><div><b>Energy</b><i><em id="gameEnergyBar" style="width:90%"></em></i></div><strong id="gameEnergyValue">90%</strong></div></aside><div class="game-toast" id="gameToast" role="status" aria-live="polite"></div><section class="game-panel" id="gamePanel"><button class="game-panel-close" id="gamePanelClose">×</button><div class="game-panel-content" id="gamePanelContent"></div></section></main></div>
+<div class="life-sidebar phone-launcher" id="lifeSidebar">
+  <button class="phone-launcher-button" data-phone-screen="phone" aria-label="Open phone" title="Open phone">📱</button>
+</div><div class="game-clock" id="gameClock" aria-live="off">☀️ --:-- · DAYTIME</div><div class="game-location" id="gameLocation">📍 MAPLEWOOD DOWNTOWN</div><div class="game-interact" id="gameInteract"></div><div class="game-controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE · <kbd>E</kbd> INTERACT · MOVE CURSOR TO LOOK</div><div class="game-touch-controls"><button data-move="up">▲</button><div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div></div><aside class="game-needs"><div class="game-need"><span>😊</span><div><b>Happiness</b><i><em id="gameHappyBar" style="width:76%"></em></i></div><strong id="gameHappyValue">76%</strong></div><div class="game-need"><span>🍽️</span><div><b>Hunger</b><i><em id="gameHungerBar" style="width:82%"></em></i></div><strong id="gameHungerValue">82%</strong></div><div class="game-need"><span>⚡</span><div><b>Energy</b><i><em id="gameEnergyBar" style="width:90%"></em></i></div><strong id="gameEnergyValue">90%</strong></div></aside><div class="game-toast" id="gameToast" role="status" aria-live="polite"></div><section class="game-panel" id="gamePanel"><button class="game-panel-close" id="gamePanelClose">×</button><div class="game-panel-content" id="gamePanelContent"></div></section></main></div>
   <div class="app-shell">
     <aside class="sidebar">
       <a class="brand" href="#" aria-label="Maple Life home"><span class="brand-mark">🍁</span><span>maple<span class="brand-light">life</span><small>YOUR STORY STARTS HERE</small></span></a>
