@@ -255,6 +255,30 @@ for(const p of places){
  if(p.type!=="park"&&p.type!=="neighbourhood")trees(p.x-22,p.z+20,3,8);
  label(p.short,p.x,p.z-24,p.emoji);
 }
+// Tighter downtown blocks: compact homes and shops fill the gaps between
+// the existing landmarks while staying clear of the river, parks and landmarks.
+const infillPalette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1,0xd0c0ad,0xbfcfc7];
+let infillIndex=0;
+for(let x=-130;x<=130;x+=20){
+ for(let z=-150;z<=150;z+=20){
+  if(Math.abs(z)<25)continue;
+  const nearLandmark=places.some(p=>p.type!=="neighbourhood"&&Math.hypot(p.x-(x+10),p.z-(z+10))<24);
+  const nearPark=[[-350,220,55],[370,180,58],[190,-300,55],[-360,-280,58],[60,280,45],[-170,300,48]].some(([px,pz,r])=>Math.hypot(px-(x+10),pz-(z+10))<r);
+  if(nearLandmark||nearPark)continue;
+  const colour=infillPalette[infillIndex%infillPalette.length];
+  const width=6.5+(infillIndex%3)*.7,depth=7+(infillIndex%2)*.8,height=4.5+(infillIndex%4)*1.1;
+  building(x+10,z+10,width,depth,height,colour,infillIndex%3===0?0x765e50:0x625f5a,infillIndex%4===0?"heritage":"block");
+  infillIndex++;
+ }
+}
+// A few denser residential clusters extend the built-up feel beyond downtown.
+for(const [cx,cz] of [[330,-430],[570,80],[-270,160],[270,-150],[-650,430],[650,480]]){
+ for(let ix=-1;ix<=1;ix++)for(let iz=-1;iz<=1;iz++){
+  if(ix===0&&iz===0)continue;
+  const j=Math.abs(ix*3+iz+4);
+  building(cx+ix*13,cz+iz*13,6.5,7,4.5+(j%3),infillPalette[j%infillPalette.length],0x665b52,j%3===0?"heritage":"block");
+ }
+}
 // Local street boards along main roads
 function roadSign(x,z,txt){
  const g=new T.Group();g.position.set(x,0,z);scene.add(g);
@@ -305,9 +329,9 @@ function addCar(axis,fixed,position,direction,index){
  cube(g,0,.52,0,1.25,.62,2.35,paint);cube(g,0,.98,-.12,.98,.55,1.18,carWindow);cube(g,0,.92,.83,1.05,.24,.42,paint);
  for(const side of [-1,1])for(const end of [-.72,.72]){const wheel=new T.Mesh(new T.CylinderGeometry(.24,.24,.16,10),tireMat);wheel.rotation.z=Math.PI/2;wheel.position.set(side*.66,.27,end);wheel.castShadow=true;g.add(wheel);}
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
- cars.push({group:g,axis,fixed,position,direction,speed:.75+(index%4)*.16});
+ cars.push({group:g,axis,fixed:fixed+(direction>0?-.58:.58),position,direction,speed:2.2+(index%4)*.35});
 }
-for(let i=0;i<8;i++){const road=-600+i*200;addCar("z",road,-610+(i%3)*150,i%2?1:-1,i);addCar("x",road,-820+(i%4)*360,i%2?-1:1,i+2);}
+for(let i=0;i<8;i++){const road=-600+i*200;addCar("z",road,-610+(i%3)*150,i%2?1:-1,i);const crossRoad=-600+i*200;addCar("x",crossRoad,-820+(i%4)*360,i%2?-1:1,i+2);}
 
 // Player marker with simple blocky avatar
 const player={x:0,z:-112,yaw:0};const avatar=new T.Group();scene.add(avatar);
