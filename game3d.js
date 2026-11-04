@@ -8,16 +8,17 @@ host.innerHTML="";
 
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0xc4d7a2);
-const camera=new T.OrthographicCamera(-70,70,48,-48,.1,3000);
-const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"low-power"});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));
-renderer.shadowMap.enabled=false;
+const camera=new T.PerspectiveCamera(48,1,.1,5000);camera.position.set(0,330,360);
+const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=T.PCFSoftShadowMap;
 renderer.outputColorSpace=T.SRGBColorSpace;
 renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 host.appendChild(renderer.domElement);
 const skyLight=new T.HemisphereLight(0xffffff,0x82966b,2.1);scene.add(skyLight);
-const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-45,100,35);scene.add(sun);
+const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-260,420,180);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-520;sun.shadow.camera.right=520;sun.shadow.camera.top=520;sun.shadow.camera.bottom=-520;sun.shadow.camera.near=1;sun.shadow.camera.far=1200;sun.shadow.bias=-0.00018;scene.add(sun);
 const nightFill=new T.AmbientLight(0x536b9a,0);scene.add(nightFill);
 const daySky=new T.Color(0xc4d7a2),nightSky=new T.Color(0x101b38),duskSky=new T.Color(0x9b7890);
 const daySun=new T.Color(0xffffff),nightSun=new T.Color(0x8296cf);
@@ -66,12 +67,12 @@ tree2:mat(0x68a66d),trunk:mat(0x82664a),sign:mat(0x18252b),
 bridge:mat(0xb9b7a8),parking:mat(0x9da39b)
 };
 const unit=new T.BoxGeometry(1,1,1);
-function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,y,z);o.scale.set(w,h,d);parent.add(o);return o;}
+function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,y,z);o.scale.set(w,h,d);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
 function slab(x,z,w,d,m,y=-.25,h=.5){return cube(scene,x,y,z,w,h,d,m);}
 // Saskatoon-scale playable footprint: approximately 18 km x 13 km.
 // At 10 metres per world unit, the footprint represents about 234 km².
 const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=10;
-slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);
+const terrain=slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);terrain.receiveShadow=true;
 const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
 // A dense 200-metre street grid with wider arterial roads every kilometre.
 for(let x=-880;x<=880;x+=20){
@@ -105,20 +106,30 @@ park(610,420,110,95);park(-650,-420,115,90);
 // Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  const g=new T.Group();g.position.set(x,0,z);scene.add(g);
- cube(g,0,h/2,0,w*.28,h*.28,d*.28,mat(color));
- cube(g,0,h*.28+.18,0,w*.28+.2,.35,d*.28+.2,mat(roofColor));
- if(style==="tower"){
-   cube(g,0,h*.28+.85,0,w*.16,1.2,d*.16,mat(color));
-   cube(g,0,h*.28+1.5,0,w*.06,.22,d*.06,mat(roofColor));
+ const wallMat=mat(color),roofMat=mat(roofColor),windowMat=new T.MeshStandardMaterial({color:0x9bc6d0,roughness:.28,metalness:.12});
+ cube(g,0,h/2,0,w,h,d,wallMat);
+ cube(g,0,h+.18,0,w+1.4,.38,d+1.4,roofMat);
+ if(style==="tower"||h>14){cube(g,0,h+.95,0,w*.48,1.5,d*.48,wallMat);cube(g,0,h+1.78,0,w*.52,.22,d*.52,roofMat);}
+ else if(style==="heritage"||style!=="modern"){
+  const roof=new T.Mesh(new T.ConeGeometry(Math.max(w,d)*.68,Math.max(2.4,h*.2),4),roofMat);roof.position.set(0,h+1,0);roof.rotation.y=Math.PI/4;roof.castShadow=true;g.add(roof);
  }
- if(style==="heritage"){
-   cube(g,0,h*.28+.45,0,w*.08,.65,d*.08,mat(roofColor));
-   cube(g,-w*.28,h*.28*.55,d*.14+.08,w*.064,h*.28*.55,.12,M.glass);
-   cube(g,w*.28,h*.28*.55,d*.14+.08,w*.064,h*.28*.55,.12,M.glass);
+ const rows=Math.max(1,Math.floor(h/3.8)),cols=Math.max(2,Math.floor(w/3.6));
+ for(let row=0;row<rows;row++){
+  const yy=2+row*(h-2.8)/rows;
+  for(let col=0;col<cols;col++){
+   const xx=-w/2+(col+.5)*w/cols;
+   cube(g,xx,yy,d/2+.025,Math.min(1.45,w/cols*.52),Math.min(1.65,h/rows*.55),.07,windowMat);
+   cube(g,xx,yy,-d/2-.025,Math.min(1.45,w/cols*.52),Math.min(1.65,h/rows*.55),.07,windowMat);
+  }
+  const sideCols=Math.max(2,Math.floor(d/3.8));
+  for(let col=0;col<sideCols;col++){
+   const zz=-d/2+(col+.5)*d/sideCols;
+   cube(g,w/2+.025,yy,zz,.07,Math.min(1.65,h/rows*.55),Math.min(1.45,d/sideCols*.52),windowMat);
+   cube(g,-w/2-.025,yy,zz,.07,Math.min(1.65,h/rows*.55),Math.min(1.45,d/sideCols*.52),windowMat);
+  }
  }
- for(let xx=-w*.32;xx<=w*.32;xx+=w*.32){
-   cube(g,xx*.28,h*.28*.55,d*.14+.08,Math.max(.35,w*.053),Math.max(.5,h*.078),.13,M.glass);
- }
+ cube(g,0,1.3,d/2+.08,Math.min(2.4,w*.18),2.6,.16,mat(0x475a52));
+ cube(g,0,2.8,d/2+.45,Math.min(4,w*.36),.35,1,roofMat);
  return g;
 }
 function trees(x,z,count=4,spread=10){
@@ -298,9 +309,7 @@ window.addEventListener("blur",()=>{
 function resize(){
  const r=host.getBoundingClientRect();if(!r.width||!r.height)return;
  renderer.setSize(r.width,r.height,false);
- const aspect=r.width/r.height,viewH=260;
- camera.left=-viewH*aspect/2;camera.right=viewH*aspect/2;
- camera.top=viewH/2;camera.bottom=-viewH/2;camera.updateProjectionMatrix();
+ camera.aspect=r.width/r.height;camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(host);resize();
 function nearest(){
@@ -343,22 +352,22 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const lookAheadX=pointerX*260,lookAheadZ=pointerY*190;
+ const lookAheadX=pointerX*125,lookAheadZ=pointerY*95;
  viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);
  viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);
  const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
- camera.position.set(targetX+Math.sin(cameraAngle)*380,1000,targetZ+Math.cos(cameraAngle)*380);
- camera.lookAt(targetX,0,targetZ);
+ camera.position.set(targetX+Math.sin(cameraAngle)*245,285,targetZ+Math.cos(cameraAngle)*285);
+ camera.lookAt(targetX,3,targetZ);
  for(const item of placeLabels){
   const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
   if(active!==item.active)item.active=active;
   const target=active?1:0;
   const current=item.sprite.material.opacity;
   item.sprite.material.opacity+= (target-current)*Math.min(1,dt*12);
-  const scale=38*item.sprite.material.opacity;
+  const scale=31*item.sprite.material.opacity;
   item.sprite.scale.set(scale,9.5*item.sprite.material.opacity,1);
-  if(active){item.sprite.position.y=26+Math.sin(t*.006)*1.2;}
-  else item.sprite.position.y=24;
+  if(active){item.sprite.position.y=32+Math.sin(t*.006)*1.2;}
+  else item.sprite.position.y=29;
  }
  renderer.render(scene,camera);
  const near=nearest(),hint=document.getElementById("gameInteract");
