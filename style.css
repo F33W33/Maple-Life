@@ -281,3 +281,19 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
  #mapleGame .life-sidebar{width:178px;padding:10px 8px}
  #mapleGame .life-sidebar.collapsed{width:51px;padding:9px 6px}
 }
+
+/* Cursor-directed camera and a crisp, centered sidebar chevron */
+#mapleGame #maple3d,#mapleGame #maple3d canvas{cursor:crosshair!important;touch-action:pan-y}
+#mapleGame #maple3d canvas:active{cursor:crosshair!important}
+#mapleGame .life-sidebar-toggle{
+ display:grid;place-items:center;padding:0;line-height:1;font-size:0;
+ width:30px;height:30px;right:-15px;top:16px;
+}
+#mapleGame .life-sidebar-toggle::before{
+ content:"";display:block;width:8px;height:8px;
+ border-top:2.5px solid currentColor;border-right:2.5px solid currentColor;
+ transform:rotate(45deg);transition:transform .28s ease;
+}
+#mapleGame .life-sidebar:not(.collapsed) .life-sidebar-toggle::before{transform:rotate(225deg)}
+#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-15px}
+#mapleGame .life-sidebar-toggle:focus-visible{outline:3px solid #b9adff;outline-offset:3px}
