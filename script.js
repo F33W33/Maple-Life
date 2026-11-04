@@ -395,13 +395,13 @@
     state.avatar=$('input[name="characterAvatar"]:checked')?.value||"🧑🏽";
     state.province=$("#characterProvince").value||"Saskatchewan";
     saveState();
-    render();
+    // Switch screens before refreshing HUD data so the game is always revealed.
     $("#characterScreen").classList.remove("character-visible");
     $("#authScreen").classList.add("auth-hidden");
     document.body.classList.add("auth-complete");
+    try { render(); } catch(error) { console.error("Maple Life HUD refresh failed:",error); }
     gameToast("Welcome to Maplewood, "+state.name+"! Your story starts now.");
   });
-
   document.querySelectorAll("[data-enter-game]").forEach(button => {
     button.addEventListener("click", () => {
       if (!state.name) state.name = "New Resident";
