@@ -41,7 +41,7 @@ function updateSaskatoonLighting(){
  const sunLevel=T.MathUtils.clamp((elevation+2)/32,0,1);
  const dusk=T.MathUtils.clamp(1-Math.abs(elevation+1)/7,0,1);
  const night=1-daylight;
- const timeText=saskatoonFormatter.format(now);
+ const timeText=saskatoonFormatter.format(now)||now.toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"});
  if(clockEl){clockEl.textContent=(elevation>-6?"☀️ ":"🌙 ")+timeText+" · "+(elevation>0?"DAYTIME":elevation>-6?"TWILIGHT":"NIGHT");clockEl.dataset.phase=elevation>0?"day":elevation>-6?"twilight":"night";}
  scene.background=daySky.clone().lerp(duskSky,dusk*.42).lerp(nightSky,night*.92);
  skyLight.intensity=.28+daylight*1.85;
@@ -51,7 +51,7 @@ function updateSaskatoonLighting(){
  sun.color.copy(nightSun).lerp(daySun,sunLevel);
  sun.position.set(-45+Math.cos((elevation+10)*Math.PI/180)*30,Math.max(5,15+elevation*2),35);
  nightFill.intensity=.12+night*.48;
- renderer.toneMappingExposure=.58+daylight*.48;
+ renderer.toneMappingExposure=.48+daylight*.58;
 }
 updateSaskatoonLighting();
 setInterval(updateSaskatoonLighting,15000);
