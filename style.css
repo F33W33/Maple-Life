@@ -252,6 +252,11 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 }
 
 /* Maple Life: hover labels, drag-friendly map and smooth collapsible sidebar */
+#mapleGame .game-clock{position:absolute;z-index:5;top:17px;right:18px;padding:9px 13px;border:1px solid #ffffff80;border-radius:13px;background:rgba(25,43,59,.78);color:#fff;font-size:11px;font-weight:900;letter-spacing:.7px;box-shadow:0 4px 16px #10243a35;backdrop-filter:blur(8px);white-space:nowrap}
+#mapleGame .game-clock[data-phase="day"]{background:rgba(38,83,63,.82)}
+#mapleGame .game-clock[data-phase="twilight"]{background:rgba(111,69,79,.86)}
+#mapleGame .game-clock[data-phase="night"]{background:rgba(22,31,62,.9)}
+@media(max-width:600px){#mapleGame .game-clock{top:58px;right:9px;font-size:9px;padding:7px 9px}}
 #mapleGame .game-minimap{display:none!important}
 #mapleGame .game-objectives{display:none!important}
 #mapleGame .life-sidebar{width:202px;padding:15px 12px 13px;pointer-events:auto;overflow:hidden;transition:width .42s cubic-bezier(.22,1,.36,1),padding .42s cubic-bezier(.22,1,.36,1),box-shadow .3s ease}
