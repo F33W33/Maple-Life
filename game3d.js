@@ -8,7 +8,7 @@ host.innerHTML="";
 
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0xc4d7a2);
-const camera=new T.PerspectiveCamera(48,1,.1,5000);camera.position.set(0,330,360);
+const camera=new T.PerspectiveCamera(48,1,.1,5000);camera.position.set(0,210,230);
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
 renderer.shadowMap.enabled=true;
@@ -18,7 +18,7 @@ renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 host.appendChild(renderer.domElement);
 const skyLight=new T.HemisphereLight(0xffffff,0x82966b,2.1);scene.add(skyLight);
-const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-260,420,180);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-520;sun.shadow.camera.right=520;sun.shadow.camera.top=520;sun.shadow.camera.bottom=-520;sun.shadow.camera.near=1;sun.shadow.camera.far=1200;sun.shadow.bias=-0.00018;scene.add(sun);
+const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-260,420,180);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-300;sun.shadow.camera.right=300;sun.shadow.camera.top=300;sun.shadow.camera.bottom=-300;sun.shadow.camera.near=1;sun.shadow.camera.far=1200;sun.shadow.bias=-0.00018;scene.add(sun);
 const nightFill=new T.AmbientLight(0x536b9a,0);scene.add(nightFill);
 const daySky=new T.Color(0xc4d7a2),nightSky=new T.Color(0x101b38),duskSky=new T.Color(0x9b7890);
 const daySun=new T.Color(0xffffff),nightSun=new T.Color(0x8296cf);
@@ -270,9 +270,9 @@ trees(-50,64,7,14);trees(54,46,7,14);trees(-92,8,7,12);trees(94,-8,7,12);
 const iTreeMats=[mat(0x398653),mat(0x579c5d),mat(0x78ad68),mat(0x2f754c)];
 function streetTree(x,z,scale=1){
  const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
- const trunk=new T.Mesh(new T.CylinderGeometry(.12,.18,1.15,6),M.trunk);trunk.position.y=.58;trunk.castShadow=true;g.add(trunk);
- const crown=new T.Mesh(new T.IcosahedronGeometry(.95,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=1.72;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
- const crown2=new T.Mesh(new T.IcosahedronGeometry(.66,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.38,2.05,.12);crown2.castShadow=true;g.add(crown2);
+ const trunk=new T.Mesh(new T.CylinderGeometry(.16,.22,1.35,6),M.trunk);trunk.position.y=.68;trunk.castShadow=true;g.add(trunk);
+ const crown=new T.Mesh(new T.IcosahedronGeometry(1.2,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=2.05;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
+ const crown2=new T.Mesh(new T.IcosahedronGeometry(.82,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.48,2.42,.12);crown2.castShadow=true;g.add(crown2);
 }
 for(const [x,z,n] of [[-350,220,22],[370,180,25],[190,-300,20],[-360,-280,22],[60,280,18],[-170,300,18],[610,420,28],[-650,-420,28],[-50,64,10],[54,46,10],[-92,8,10],[94,-8,10]]){
  for(let i=0;i<n;i++){const a=i*2.399963,rad=4+Math.sqrt(i)*2.2;streetTree(x+Math.cos(a)*rad,z+Math.sin(a)*rad,.72+(i%4)*.1);}
@@ -288,7 +288,7 @@ const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),ma
 const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
 const pedestrians=[];
 function addPedestrian(x,z,index,dx,dz){
- const g=new T.Group();g.position.set(x,0,z);g.rotation.y=Math.atan2(dx,dz);scene.add(g);
+ const g=new T.Group();g.position.set(x,0,z);g.rotation.y=Math.atan2(dx,dz);g.scale.setScalar(1.35);scene.add(g);
  const shirt=pedestrianMats[index%pedestrianMats.length],skin=skinMats[index%skinMats.length],pants=mat(index%2?0x39475c:0x45413b);
  cube(g,0,1.05,0,.48,.68,.28,shirt);cube(g,0,1.62,0,.34,.38,.34,skin);cube(g,0,1.82,-.015,.35,.12,.35,mat(0x40352f));
  const leftArm=cube(g,-.31,1.05,0,.16,.56,.17,shirt),rightArm=cube(g,.31,1.05,0,.16,.56,.17,shirt);
@@ -301,7 +301,7 @@ walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
 const carWindow=new T.MeshStandardMaterial({color:0x9dcbd3,roughness:.22,metalness:.12});
 function addCar(axis,fixed,position,direction,index){
- const g=new T.Group();scene.add(g);const paint=mat(carPaint[index%carPaint.length]);
+ const g=new T.Group();g.scale.setScalar(1.35);scene.add(g);const paint=mat(carPaint[index%carPaint.length]);
  cube(g,0,.52,0,1.25,.62,2.35,paint);cube(g,0,.98,-.12,.98,.55,1.18,carWindow);cube(g,0,.92,.83,1.05,.24,.42,paint);
  for(const side of [-1,1])for(const end of [-.72,.72]){const wheel=new T.Mesh(new T.CylinderGeometry(.24,.24,.16,10),tireMat);wheel.rotation.z=Math.PI/2;wheel.position.set(side*.66,.27,end);wheel.castShadow=true;g.add(wheel);}
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
@@ -396,11 +396,11 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const lookAheadX=pointerX*125,lookAheadZ=pointerY*95;
+ const lookAheadX=pointerX*72,lookAheadZ=pointerY*58;
  viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);
  viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);
  const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
- camera.position.set(targetX+Math.sin(cameraAngle)*245,285,targetZ+Math.cos(cameraAngle)*285);
+ camera.position.set(targetX+Math.sin(cameraAngle)*155,190,targetZ+Math.cos(cameraAngle)*175);
  camera.lookAt(targetX,3,targetZ);
  for(const item of placeLabels){
   const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
