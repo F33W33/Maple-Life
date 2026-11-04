@@ -300,3 +300,49 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .game-date-pill b{color:#fff}
 #mapleGame .game-tools{display:none!important}
 @media(max-width:760px){#mapleGame .game-topbar{height:58px;flex-basis:58px;padding:5px 9px;gap:5px}#mapleGame .game-brand{min-width:0}#mapleGame .game-world-info{position:static;transform:none;margin-left:auto;gap:4px}#mapleGame .game-date-pill{display:none!important}}
+
+
+/* Pocket phone interface for sidebar apps */
+#mapleGame .game-panel{width:min(390px,calc(100% - 28px));max-height:min(88%,720px);padding:0;background:transparent;border:0;box-shadow:none;overflow:visible}
+#mapleGame .game-panel-close{display:none}
+#mapleGame .game-panel-content{padding:0}
+#mapleGame .phone-shell{position:relative;width:100%;min-height:510px;max-height:min(82vh,690px);overflow:hidden;display:flex;flex-direction:column;padding:22px 19px 15px;border:7px solid #26392d;border-radius:36px;background:linear-gradient(160deg,#f8fbf3,#edf4e8);color:#293d2e;box-shadow:0 22px 65px #07170e99,inset 0 0 0 1px #fff}
+#mapleGame .phone-speaker{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:68px;height:7px;border-radius:9px;background:#26392d}
+#mapleGame .phone-status{display:flex;justify-content:space-between;padding:4px 3px 15px;font-size:9px;font-weight:900;letter-spacing:1.2px;color:#82917d}
+#mapleGame .phone-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 1px 16px;border-bottom:1px solid #e0e9da}
+#mapleGame .phone-heading small{font-size:8px;font-weight:900;letter-spacing:1.4px;color:#8a9a82}
+#mapleGame .phone-heading h2{margin:5px 0 0;font:800 23px Manrope;color:#2c4432}
+#mapleGame .phone-close{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:#e5eddf;color:#38523d;font-size:24px;cursor:pointer}
+#mapleGame .phone-screen-content{flex:1;min-height:300px;overflow:auto;padding:17px 1px}
+#mapleGame .phone-app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#mapleGame .phone-app-card{min-height:92px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px;padding:14px;border:1px solid #e0e9d9;border-radius:17px;background:#fff;color:#39543d;font-size:23px;box-shadow:0 3px 0 #e6ede1;cursor:pointer}
+#mapleGame .phone-app-card b{font-size:12px}
+#mapleGame .phone-app-card span{align-self:flex-end;font-size:15px}
+#mapleGame .phone-profile{display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px;margin-bottom:14px;border-radius:17px;background:#fff}
+#mapleGame .phone-profile>span{font-size:37px}
+#mapleGame .phone-profile b{font-size:15px}
+#mapleGame .phone-profile small,#mapleGame .phone-note{font-size:11px;color:#82917d}
+#mapleGame .phone-profile.compact{flex-direction:row;align-items:center;gap:10px;padding:12px}
+#mapleGame .phone-profile.compact>span{font-size:29px}
+#mapleGame .phone-profile.compact div{display:flex;flex-direction:column;gap:3px}
+#mapleGame .phone-profile.compact strong{margin-left:auto;font-size:11px}
+#mapleGame .phone-action{width:100%;display:flex;justify-content:space-between;align-items:center;margin:9px 0;padding:13px 14px;border:1px solid #dce8d7;border-radius:13px;background:#fff;color:#38533b;font-size:12px;font-weight:800;cursor:pointer}
+#mapleGame .phone-feature,#mapleGame .phone-empty{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;padding:25px 17px;border-radius:18px;background:#fff}
+#mapleGame .phone-feature>span,#mapleGame .phone-empty>span{font-size:42px}
+#mapleGame .phone-feature small,#mapleGame .phone-empty small{max-width:230px;font-size:11px;line-height:1.5;color:#82917d}
+#mapleGame .phone-balance{display:flex;justify-content:space-between;padding:14px;border-radius:13px;background:#fff;font-size:9px;font-weight:900;color:#82917d}
+#mapleGame .phone-balance b{font-size:14px;color:#38533b}
+#mapleGame .phone-item-list{display:grid;gap:8px}
+#mapleGame .phone-item{display:flex;align-items:center;gap:10px;padding:12px;border-radius:13px;background:#fff}
+#mapleGame .phone-item>span{font-size:24px}
+#mapleGame .phone-item b{font-size:12px}
+#mapleGame .phone-item small{margin-left:auto;font-size:9px;color:#82917d}
+#mapleGame .phone-quest{display:flex;align-items:center;gap:11px;margin-bottom:9px;padding:12px;border-radius:13px;background:#fff}
+#mapleGame .phone-quest>span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#e9f1e3;color:#456448;font-weight:900}
+#mapleGame .phone-quest div{display:flex;flex-direction:column;gap:3px}
+#mapleGame .phone-quest b{font-size:11px}
+#mapleGame .phone-quest small{font-size:10px;color:#82917d}
+#mapleGame .phone-nav{display:flex;justify-content:space-around;padding:12px 5px 2px;border-top:1px solid #e0e9da;color:#71836e}
+#mapleGame .phone-nav span{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:16px}
+#mapleGame .phone-nav small{font-size:7px;font-weight:900;letter-spacing:1px}
+@media(max-width:600px){#mapleGame .game-panel{width:min(350px,calc(100% - 20px))}#mapleGame .phone-shell{min-height:470px;border-width:6px;border-radius:30px;padding:20px 15px 13px}}
