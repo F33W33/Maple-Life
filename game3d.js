@@ -9,7 +9,7 @@ const mini=document.getElementById("mapleMiniMap"),mc=mini?.getContext("2d");
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0x9edcf4);
 scene.fog=new T.Fog(0x9edcf4,90,230);
-const camera=new T.PerspectiveCamera(78,1,.08,260);
+const camera=new T.OrthographicCamera(-24,24,18,-18,.1,300); camera.zoom=1;
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"low-power"});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));
 renderer.shadowMap.enabled=false;
@@ -162,28 +162,29 @@ function car(x,z,color){
 }
 car(-11,-13,0xd65c50);car(11,13,0x4b8fc2);car(-51,11,0xe7bd51);
 const player={x:0,z:5,yaw:Math.PI,pitch:0};
+const avatar=new T.Group();scene.add(avatar);
+const avatarSkin=mat(0xc98c68),avatarShirt=mat(0x35a0d2),avatarPants=mat(0x344c78),avatarHair=mat(0x342a28);
+cube(avatar,0,.9,0,.85,1.05,.52,avatarShirt);
+cube(avatar,-.25,.28,0,.3,.65,.38,avatarPants);cube(avatar,.25,.28,0,.3,.65,.38,avatarPants);
+cube(avatar,-.55,.92,0,.25,.8,.3,avatarShirt);cube(avatar,.55,.92,0,.25,.8,.3,avatarShirt);
+cube(avatar,0,1.72,0,.72,.72,.68,avatarSkin);cube(avatar,0,2.1,0,.75,.2,.7,avatarHair);
+cube(avatar,-.17,1.78,.35,.08,.08,.035,M.black);cube(avatar,.17,1.78,.35,.08,.08,.035,M.black);
 let keys={},walk=0,last=performance.now(),near=null;
-function resize(){const r=host.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}
+function resize(){const r=host.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);const aspect=r.width/r.height;const viewH=38;camera.left=-viewH*aspect/2;camera.right=viewH*aspect/2;camera.top=viewH/2;camera.bottom=-viewH/2;camera.updateProjectionMatrix();}
 new ResizeObserver(resize).observe(host);resize();
 function nearest(){let best=null,dist=1e9;for(const p of places){const d=Math.hypot(player.x-p.x,player.z-p.z);if(d<dist){dist=d;best=p;}}return dist<12?best:null;}
 function interact(){near=nearest();if(near)document.dispatchEvent(new CustomEvent("maple:interact",{detail:{id:near.id}}));else document.dispatchEvent(new CustomEvent("maple:game-toast",{detail:{message:"Walk closer to a building to interact."}}));}
 window.addEventListener("keydown",e=>{if(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)){keys[e.code]=true;if(!e.target.closest("input,textarea,select"))e.preventDefault();}if(e.code==="KeyE"&&!e.repeat)interact();if(/^Digit[1-5]$/.test(e.code))document.querySelector('[data-hotbar="'+["phone","eat","coffee","rest","inventory"][Number(e.code.slice(-1))-1]+'"]')?.click();});
 window.addEventListener("keyup",e=>keys[e.code]=false);window.addEventListener("blur",()=>keys={});
-let dragging=false,lastX=0,lastY=0,pointerLocked=false;
-renderer.domElement.addEventListener("click",()=>{if(renderer.domElement.requestPointerLock&&!pointerLocked)renderer.domElement.requestPointerLock();});
-document.addEventListener("pointerlockchange",()=>{pointerLocked=document.pointerLockElement===renderer.domElement;});
-document.addEventListener("mousemove",e=>{if(pointerLocked){player.yaw-=e.movementX*.0025;player.pitch=T.MathUtils.clamp(player.pitch-e.movementY*.002,-1.15,1.15);}});
-renderer.domElement.addEventListener("pointerdown",e=>{if(pointerLocked)return;dragging=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId);});
-renderer.domElement.addEventListener("pointermove",e=>{if(dragging){player.yaw-=(e.clientX-lastX)*.004;player.pitch=T.MathUtils.clamp(player.pitch-(e.clientY-lastY)*.003,-1.15,1.15);lastX=e.clientX;lastY=e.clientY;}});
-renderer.domElement.addEventListener("pointerup",()=>dragging=false);renderer.domElement.addEventListener("pointercancel",()=>dragging=false);
+renderer.domElement.addEventListener("wheel",e=>{e.preventDefault();camera.zoom=T.MathUtils.clamp(camera.zoom+(e.deltaY<0?.12:-.12),.65,2.1);camera.updateProjectionMatrix();},{passive:false});
 document.querySelectorAll("[data-move]").forEach(b=>{const k={up:"KeyW",down:"KeyS",left:"KeyA",right:"KeyD"}[b.dataset.move];b.addEventListener("pointerdown",e=>{e.preventDefault();keys[k]=true;});["pointerup","pointerleave","pointercancel"].forEach(n=>b.addEventListener(n,()=>keys[k]=false));});
 function miniDraw(){if(!mc||!mini)return;const r=mini.getBoundingClientRect();if(!r.width)return;mc.clearRect(0,0,r.width,r.height);mc.fillStyle="#8bc977";mc.fillRect(0,0,r.width,r.height);mc.strokeStyle="#657078";mc.lineWidth=4;for(let n=0;n<5;n++){mc.beginPath();mc.moveTo(n*r.width/4,0);mc.lineTo(n*r.width/4,r.height);mc.moveTo(0,n*r.height/4);mc.lineTo(r.width,n*r.height/4);mc.stroke();}places.forEach(p=>{mc.fillStyle="#e5a46b";mc.fillRect((p.x+110)/220*r.width-3,(p.z+110)/220*r.height-3,6,6);});mc.fillStyle="#fff";mc.beginPath();mc.arc((player.x+110)/220*r.width,(player.z+110)/220*r.height,4,0,7);mc.fill();}
 function frame(t){
  requestAnimationFrame(frame);const dt=Math.min(.04,(t-last)/1000);last=t;
  let forward=0,side=0;if(keys.KeyW||keys.ArrowUp)forward+=1;if(keys.KeyS||keys.ArrowDown)forward-=1;if(keys.KeyA||keys.ArrowLeft)side-=1;if(keys.KeyD||keys.ArrowRight)side+=1;
- const len=Math.hypot(forward,side);if(len){forward/=len;side/=len;const speed=keys.ShiftLeft||keys.ShiftRight?8:5.2;player.x+=(-Math.sin(player.yaw)*forward+Math.cos(player.yaw)*side)*speed*dt;player.z+=(-Math.cos(player.yaw)*forward-Math.sin(player.yaw)*side)*speed*dt;player.x=T.MathUtils.clamp(player.x,-103,103);player.z=T.MathUtils.clamp(player.z,-103,103);walk+=dt*speed;}
- camera.position.set(player.x,1.68,player.z);
- camera.rotation.order="YXZ";camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
+ const len=Math.hypot(forward,side);if(len){forward/=len;side/=len;const speed=keys.ShiftLeft||keys.ShiftRight?8:5.2;player.x+=side*speed*dt;player.z-=forward*speed*dt;player.x=T.MathUtils.clamp(player.x,-103,103);player.z=T.MathUtils.clamp(player.z,-103,103);walk+=dt*speed;player.yaw=Math.atan2(side,forward);}
+ avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;avatar.position.y=Math.abs(Math.sin(walk*1.4))*.035;
+ camera.position.set(player.x,58,player.z+29);camera.lookAt(player.x,0,player.z);
  renderer.render(scene,camera);near=nearest();
  const hint=document.getElementById("gameInteract");if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to visit "+near.name:"";}
  const loc=document.getElementById("gameLocation");if(loc)loc.textContent="📍 "+(near?near.name:"MAPLEWOOD · CANADA");
