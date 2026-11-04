@@ -29,14 +29,30 @@
       <div class="auth-eyebrow">WELCOME TO MAPLE LIFE</div>
       <h2>Ready to move in?</h2>
       <p class="auth-intro">Your next chapter starts here. Step into the city and start building your life.</p>
-      <a class="auth-primary" href="#mapleGame"><span><b>Create an account</b><small>Sign up for Maple Life</small></span><strong>→</strong></a>
-      <a class="auth-secondary" href="#mapleGame"><span>Already have an account?</span> <b>Log in</b></a>
+      <button class="auth-primary" id="authSignup" type="button"><span><b>Create an account</b><small>Start a new resident profile</small></span><strong>→</strong></button>
+      <button class="auth-secondary" id="authLogin" type="button"><span>Already have an account?</span> <b>Log in</b></button>
       <div class="auth-divider"><span>YOUR WORLD IS WAITING</span></div>
       <div class="auth-preview"><span>🌳</span><span>🏙️</span><span>🏡</span><span>🚲</span><span>☕</span></div>
-      <small class="auth-note">Account features are coming soon. For now, either option takes you straight into the game.</small>
+      <small class="auth-note">Your character and progress are saved on this device.</small>
     </div>
     <div class="auth-footer">🍁 MAPLE LIFE <span>·</span> LIVE. WORK. EXPLORE.</div>
   </div>
+</section>
+<section id="characterScreen" class="character-screen" aria-label="Character creation">
+ <div class="character-top"><div class="character-brand"><span>🍁</span><b>MAPLE LIFE</b></div><span class="character-step">STEP 02 <i></i> CHARACTER CREATION</span></div>
+ <div class="character-layout">
+  <div class="character-intro"><span class="auth-kicker">MAKE YOURSELF AT HOME</span><h1>First, let's<br><em>meet you.</em></h1><p>Create your resident and choose how you want to show up in Maplewood. You can update your details later.</p><div class="character-preview-card"><div class="character-preview-halo"></div><div id="characterAvatarPreview">🧑🏽</div><span>YOUR RESIDENT</span><b id="characterNamePreview">New Resident</b><small id="characterProvincePreview">Saskatchewan, Canada</small></div></div>
+  <form id="characterForm" class="character-form">
+   <div class="character-form-heading"><span>🍁 YOUR NEW BEGINNING</span><h2>Build your character.</h2><p>Choose a name, appearance, and home province.</p></div>
+   <label for="characterName">What should we call you?</label><input id="characterName" maxlength="18" placeholder="Enter your character name" required autocomplete="given-name">
+   <label>Choose your appearance</label><div class="character-avatars">
+    <label><input type="radio" name="characterAvatar" value="🧑🏽" checked><span>🧑🏽</span></label><label><input type="radio" name="characterAvatar" value="👩🏻"><span>👩🏻</span></label><label><input type="radio" name="characterAvatar" value="🧔🏾"><span>🧔🏾</span></label><label><input type="radio" name="characterAvatar" value="👨🏻"><span>👨🏻</span></label><label><input type="radio" name="characterAvatar" value="👩🏾"><span>👩🏾</span></label><label><input type="radio" name="characterAvatar" value="🧑🏻"><span>🧑🏻</span></label><label><input type="radio" name="characterAvatar" value="👩🏽"><span>👩🏽</span></label><label><input type="radio" name="characterAvatar" value="🧑🏿"><span>🧑🏿</span></label><label><input type="radio" name="characterAvatar" value="👩🏿"><span>👩🏿</span></label><label><input type="radio" name="characterAvatar" value="👨🏿"><span>👨🏿</span></label>
+   </div>
+   <label for="characterProvince">Where are you moving from?</label><select id="characterProvince"><option>Alberta</option><option>British Columbia</option><option>Manitoba</option><option>New Brunswick</option><option>Newfoundland and Labrador</option><option>Northwest Territories</option><option>Nova Scotia</option><option>Nunavut</option><option>Ontario</option><option>Prince Edward Island</option><option>Quebec</option><option selected>Saskatchewan</option><option>Yukon</option></select>
+   <button class="character-save" type="submit">Save character <span>→</span></button>
+   <button class="character-back" id="characterBack" type="button">← Back to welcome</button>
+  </form>
+ </div>
 </section>
 <div id="mapleGame" class="maple-game">
 <header class="game-topbar"><div class="game-brand"><span class="game-leaf">🍁</span><span><b>Maple Life</b><small>LIVE. WORK. EXPLORE.</small></span></div><div class="game-world-info"><div class="game-pill">💵 <b id="gameCash">$1,000</b></div><div class="game-pill province-pill">🍁 <b id="gameProvince">Saskatchewan</b></div></div><div class="game-pill game-date-pill">🍁 <b id="gameDate">MAPLEWOOD · DAY 1</b></div></header>
