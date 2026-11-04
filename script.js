@@ -357,6 +357,51 @@
     document.addEventListener("click",e=>{const settingsButton=e.target.closest("[data-sidebar-settings]");if(settingsButton){openProfileEditor();return;}const phoneScreen=e.target.closest("[data-phone-screen]");if(phoneScreen){openGamePanel(phoneScreen.dataset.phoneScreen);return;}const phoneGo=e.target.closest("[data-phone-go]");if(phoneGo){const target=phoneGo.dataset.phoneGo;$("#gamePanel").classList.remove("open");if(target==="profile-edit"){openProfileEditor();return;}navigate(target);return;}const t=e.target.closest("[data-game-panel]");if(t){openGamePanel(t.dataset.gamePanel);return;}const hot=e.target.closest("[data-hotbar]");if(hot){const a=hot.dataset.hotbar;if(a==="eat")activity("eat");else if(a==="coffee")activity("coffee");else if(a==="rest")activity("rest");else openGamePanel(a);return;}const a=e.target.closest("[data-panel-action]");if(a){const v=a.dataset.panelAction;$("#gamePanel").classList.remove("open");if(v==="profile-edit"){openProfileEditor();return;}navigate(v);}});
   $("#gamePanelClose")?.addEventListener("click",()=>$("#gamePanel").classList.remove("open"));
   document.addEventListener("click",e=>{if(e.target.closest("#phoneClose"))$("#gamePanel").classList.remove("open");});
+
+  let authMode = "signup";
+  function showCharacterCreation(mode){
+    authMode=mode;
+    $("#characterName").value=mode==="login"?(state.name||""):"";
+    $("#characterProvince").value=state.province||"Saskatchewan";
+    const chosen=$('input[name="characterAvatar"][value="'+(state.avatar||"🧑🏽")+'"]');
+    if(chosen)chosen.checked=true;
+    updateCharacterPreview();
+    $("#authScreen").classList.add("auth-hidden");
+    $("#characterScreen").classList.add("character-visible");
+    document.body.classList.remove("auth-complete");
+  }
+  function updateCharacterPreview(){
+    const name=$("#characterName").value.trim()||"New Resident";
+    const avatar=$('input[name="characterAvatar"]:checked')?.value||"🧑🏽";
+    const province=$("#characterProvince").value||"Saskatchewan";
+    $("#characterAvatarPreview").textContent=avatar;
+    $("#characterNamePreview").textContent=name;
+    $("#characterProvincePreview").textContent=province+", Canada";
+  }
+  $("#authSignup").addEventListener("click",()=>showCharacterCreation("signup"));
+  $("#authLogin").addEventListener("click",()=>showCharacterCreation("login"));
+  $("#characterBack").addEventListener("click",()=>{
+    $("#characterScreen").classList.remove("character-visible");
+    $("#authScreen").classList.remove("auth-hidden");
+  });
+  $("#characterName").addEventListener("input",updateCharacterPreview);
+  $("#characterProvince").addEventListener("change",updateCharacterPreview);
+  document.querySelectorAll('input[name="characterAvatar"]').forEach(input=>input.addEventListener("change",updateCharacterPreview));
+  $("#characterForm").addEventListener("submit",event=>{
+    event.preventDefault();
+    const name=$("#characterName").value.trim();
+    if(!name){$("#characterName").focus();return;}
+    state.name=name;
+    state.avatar=$('input[name="characterAvatar"]:checked')?.value||"🧑🏽";
+    state.province=$("#characterProvince").value||"Saskatchewan";
+    saveState();
+    render();
+    $("#characterScreen").classList.remove("character-visible");
+    $("#authScreen").classList.add("auth-hidden");
+    document.body.classList.add("auth-complete");
+    gameToast("Welcome to Maplewood, "+state.name+"! Your story starts now.");
+  });
+
   document.querySelectorAll("[data-enter-game]").forEach(button => {
     button.addEventListener("click", () => {
       if (!state.name) state.name = "New Resident";
@@ -379,5 +424,5 @@
     lifeSidebarToggle.setAttribute("aria-label",collapsed?"Expand menu":"Collapse menu");
   });
   render();
-  if (state.name) $("#welcomeModal").classList.remove("open");
+  $("#welcomeModal").classList.remove("open");
 })();
