@@ -383,3 +383,20 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 .character-save span{font-size:20px}.character-back{display:block;margin:17px auto 0;border:0;background:transparent;color:#81917d;font-size:10px;font-weight:800;cursor:pointer}
 .auth-primary,.auth-secondary{font-family:inherit}
 @media(max-width:780px){.character-layout{grid-template-columns:1fr;gap:22px;width:min(520px,calc(100% - 32px));padding:25px 0 35px}.character-intro h1{font-size:43px;margin:10px 0}.character-intro>p{font-size:11px}.character-preview-card{display:none}.character-top{height:62px;padding:0 17px}.character-form{padding:23px}.character-step{font-size:7px}}
+
+/* Hide native scrollbars inside the phone while keeping content scrollable. */
+#mapleGame .phone-shell,
+#mapleGame .phone-screen-content{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+#mapleGame .phone-shell::-webkit-scrollbar,
+#mapleGame .phone-screen-content::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+#mapleGame .phone-screen-content{overflow-y:auto;overscroll-behavior:contain}
+body.auth-complete #mapleGame{display:flex!important;visibility:visible!important;opacity:1!important}
+body.auth-complete #authScreen,
+body.auth-complete #characterScreen{display:none!important;visibility:hidden!important}
