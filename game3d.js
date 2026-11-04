@@ -16,8 +16,45 @@ renderer.outputColorSpace=T.SRGBColorSpace;
 renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 host.appendChild(renderer.domElement);
-scene.add(new T.HemisphereLight(0xffffff,0x82966b,2.1));
+const skyLight=new T.HemisphereLight(0xffffff,0x82966b,2.1);scene.add(skyLight);
 const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-45,100,35);scene.add(sun);
+const nightFill=new T.AmbientLight(0x536b9a,0);scene.add(nightFill);
+const daySky=new T.Color(0xc4d7a2),nightSky=new T.Color(0x101b38),duskSky=new T.Color(0x9b7890);
+const daySun=new T.Color(0xffffff),nightSun=new T.Color(0x8296cf);
+const clockEl=document.getElementById("gameClock");
+const saskatoonFormatter=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit",hour12:true});
+const saskatoonParts=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Regina",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric",hourCycle:"h23"});
+function solarElevation(date){
+ const parts=Object.fromEntries(saskatoonParts.formatToParts(date).map(p=>[p.type,Number(p.value)]));
+ const dayOfYear=Math.floor((Date.UTC(parts.year,parts.month-1,parts.day)-Date.UTC(parts.year,0,0))/86400000);
+ const hour=parts.hour+parts.minute/60+parts.second/3600;
+ const gamma=2*Math.PI/365*(dayOfYear-1+(hour-12)/24);
+ const eq=229.18*(0.000075+0.001868*Math.cos(gamma)-0.032077*Math.sin(gamma)-0.014615*Math.cos(2*gamma)-0.040849*Math.sin(2*gamma));
+ const decl=0.006918-0.399912*Math.cos(gamma)+0.070257*Math.sin(gamma)-0.006758*Math.cos(2*gamma)+0.000907*Math.sin(2*gamma)-0.002697*Math.cos(3*gamma)+0.00148*Math.sin(3*gamma);
+ const solarMinutes=hour*60+eq+4*(-106.67)-0;
+ const ha=(solarMinutes/4-180)*Math.PI/180,lat=52.1332*Math.PI/180;
+ return Math.asin(Math.sin(lat)*Math.sin(decl)+Math.cos(lat)*Math.cos(decl)*Math.cos(ha))*180/Math.PI;
+}
+function updateSaskatoonLighting(){
+ const now=new Date(),elevation=solarElevation(now);
+ const daylight=T.MathUtils.clamp((elevation+6)/12,0,1);
+ const sunLevel=T.MathUtils.clamp((elevation+2)/32,0,1);
+ const dusk=T.MathUtils.clamp(1-Math.abs(elevation+1)/7,0,1);
+ const night=1-daylight;
+ const timeText=saskatoonFormatter.format(now);
+ if(clockEl){clockEl.textContent=(elevation>-6?"☀️ ":"🌙 ")+timeText+" · "+(elevation>0?"DAYTIME":elevation>-6?"TWILIGHT":"NIGHT");clockEl.dataset.phase=elevation>0?"day":elevation>-6?"twilight":"night";}
+ scene.background=daySky.clone().lerp(duskSky,dusk*.42).lerp(nightSky,night*.92);
+ skyLight.intensity=.28+daylight*1.85;
+ skyLight.color.set(0x9eb4d5).lerp(new T.Color(0xffffff),daylight);
+ skyLight.groundColor.set(0x17213b).lerp(new T.Color(0x82966b),daylight);
+ sun.intensity=.08+sunLevel*1.85;
+ sun.color.copy(nightSun).lerp(daySun,sunLevel);
+ sun.position.set(-45+Math.cos((elevation+10)*Math.PI/180)*30,Math.max(5,15+elevation*2),35);
+ nightFill.intensity=.12+night*.48;
+ renderer.toneMappingExposure=.58+daylight*.48;
+}
+updateSaskatoonLighting();
+setInterval(updateSaskatoonLighting,15000);
 const mat=c=>new T.MeshLambertMaterial({color:c});
 const M={
 land:mat(0xb9d99a),grass:mat(0x8fc879),grass2:mat(0xa8d58b),road:mat(0x59636a),
