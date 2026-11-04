@@ -355,3 +355,31 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 @media(max-width:600px){#mapleGame .life-sidebar.phone-launcher{left:10px;top:82px;transform:none;width:50px;height:50px}#mapleGame .phone-launcher-button{width:50px;height:50px;border-radius:15px;font-size:24px}}
 /* Perspective city lighting and hover labels */
 #mapleGame #maple3d canvas{display:block;width:100%;height:100%}
+
+/* Login -> character creation -> game flow. Map markup and rendering untouched. */
+.auth-screen.auth-hidden{display:none!important}
+.character-screen{position:fixed;inset:0;z-index:1001;display:none;overflow:auto;background:linear-gradient(135deg,#edf5e8,#f8faf4 55%,#e6efe0);color:#26392d;font-family:"DM Sans",sans-serif}
+.character-screen.character-visible{display:block}
+.character-top{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(22px,5vw,76px);border-bottom:1px solid #dfe9d9;background:#ffffffa8}
+.character-brand{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:2px}.character-brand span{font-size:25px}
+.character-step{display:flex;align-items:center;gap:10px;color:#849582;font-size:8px;font-weight:900;letter-spacing:1.5px}.character-step i{width:34px;height:2px;background:#b5cda9}
+.character-layout{width:min(1120px,calc(100% - 48px));min-height:calc(100vh - 76px);margin:0 auto;display:grid;grid-template-columns:.9fr 1.1fr;align-items:center;gap:clamp(35px,7vw,100px);padding:45px 0}
+.character-intro h1{font:900 clamp(46px,6vw,72px)/.98 Manrope,sans-serif;letter-spacing:-3px;margin:17px 0;color:#263f30}.character-intro h1 em{font-style:normal;color:#71996c}
+.character-intro>p{max-width:390px;color:#71816f;font-size:13px;line-height:1.8}
+.character-preview-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;width:min(100%,330px);margin-top:35px;padding:27px 20px 23px;overflow:hidden;border:1px solid #dfe9d9;border-radius:23px;background:#ffffffb8;box-shadow:0 14px 38px #35583b12}
+.character-preview-halo{position:absolute;top:12px;width:132px;height:132px;border-radius:50%;background:radial-gradient(circle,#e3f0d9,#f4f8ed 70%)}
+#characterAvatarPreview{position:relative;z-index:1;font-size:78px;line-height:1.6;filter:drop-shadow(0 9px 5px #314c3022)}
+.character-preview-card>span{font-size:8px;font-weight:900;letter-spacing:1.5px;color:#91a08c}.character-preview-card>b{font:800 19px Manrope}.character-preview-card>small{font-size:10px;color:#81917c}
+.character-form{padding:clamp(23px,4vw,40px);border:1px solid #e0e9da;border-radius:25px;background:#fff;box-shadow:0 20px 60px #263d2b12}
+.character-form-heading>span{font-size:8px;font-weight:900;letter-spacing:1.6px;color:#7c9a72}.character-form-heading h2{margin:9px 0 5px;font:900 28px Manrope;letter-spacing:-1px}.character-form-heading p{margin:0 0 23px;color:#879484;font-size:11px}
+.character-form>label{display:block;margin:17px 0 8px;color:#435744;font-size:10px;font-weight:900}
+.character-form>input,.character-form>select{box-sizing:border-box;width:100%;height:46px;padding:0 13px;border:1px solid #dfe8da;border-radius:12px;background:#fbfdf9;color:#344b37;font:500 12px "DM Sans",sans-serif;outline:none}
+.character-form>input:focus,.character-form>select:focus{border-color:#85a97b;box-shadow:0 0 0 3px #dcebd5}
+.character-avatars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.character-avatars label{cursor:pointer}.character-avatars input{position:absolute;opacity:0;pointer-events:none}
+.character-avatars span{display:grid;place-items:center;height:54px;border:1px solid #e1e9dc;border-radius:12px;background:#f8fbf5;font-size:27px;transition:.15s}
+.character-avatars input:checked+span{border:2px solid #789d70;background:#edf5e8;box-shadow:0 0 0 3px #e6f0e0}
+.character-save{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:24px;padding:15px 17px;border:0;border-radius:13px;background:#294532;color:white;font-size:12px;font-weight:900;box-shadow:0 4px 0 #1a3022;cursor:pointer}
+.character-save span{font-size:20px}.character-back{display:block;margin:17px auto 0;border:0;background:transparent;color:#81917d;font-size:10px;font-weight:800;cursor:pointer}
+.auth-primary,.auth-secondary{font-family:inherit}
+@media(max-width:780px){.character-layout{grid-template-columns:1fr;gap:22px;width:min(520px,calc(100% - 32px));padding:25px 0 35px}.character-intro h1{font-size:43px;margin:10px 0}.character-intro>p{font-size:11px}.character-preview-card{display:none}.character-top{height:62px;padding:0 17px}.character-form{padding:23px}.character-step{font-size:7px}}
