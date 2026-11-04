@@ -6,7 +6,9 @@ const host=document.getElementById("maple3d");
 if(!host)return;
 host.innerHTML="";
 
-const T=THREE,scene=new T.Scene();
+const T=THREE,scene=new T.Scene(),world=new T.Group();
+scene.add(world);
+world.scale.setScalar(.5);
 scene.background=new T.Color(0xc4d7a2);
 const camera=new T.PerspectiveCamera(48,1,.1,6000);camera.position.set(0,1500,1100);
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
@@ -17,9 +19,9 @@ renderer.outputColorSpace=T.SRGBColorSpace;
 renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 host.appendChild(renderer.domElement);
-const skyLight=new T.HemisphereLight(0xffffff,0x82966b,2.1);scene.add(skyLight);
-const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-260,420,180);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-300;sun.shadow.camera.right=300;sun.shadow.camera.top=300;sun.shadow.camera.bottom=-300;sun.shadow.camera.near=1;sun.shadow.camera.far=1200;sun.shadow.bias=-0.00018;scene.add(sun);
-const nightFill=new T.AmbientLight(0x536b9a,0);scene.add(nightFill);
+const skyLight=new T.HemisphereLight(0xffffff,0x82966b,2.1);world.add(skyLight);
+const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-260,420,180);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);sun.shadow.camera.left=-300;sun.shadow.camera.right=300;sun.shadow.camera.top=300;sun.shadow.camera.bottom=-300;sun.shadow.camera.near=1;sun.shadow.camera.far=1200;sun.shadow.bias=-0.00018;world.add(sun);
+const nightFill=new T.AmbientLight(0x536b9a,0);world.add(nightFill);
 const daySky=new T.Color(0xc4d7a2),nightSky=new T.Color(0x101b38),duskSky=new T.Color(0x9b7890);
 const daySun=new T.Color(0xffffff),nightSun=new T.Color(0x8296cf);
 const clockEl=document.getElementById("gameClock");
@@ -71,7 +73,7 @@ function cube(parent,x,y,z,w,h,d,m){const o=new T.Mesh(unit,m);o.position.set(x,
 function slab(x,z,w,d,m,y=-.25,h=.5){return cube(scene,x,y,z,w,h,d,m);}
 // Compact Saskatoon-inspired playable footprint: approximately 9 km x 6.5 km.
 // Buildings, roads, residents and vehicles retain their existing density.
-const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=5;
+const WORLD_W=1800,WORLD_D=1300,UNIT_METRES=10;
 const terrain=slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);terrain.receiveShadow=true;
 const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
 // A dense 200-metre street grid with wider arterial roads every kilometre.
@@ -105,7 +107,7 @@ park(-360,-280,90,82);park(60,280,80,65);park(-170,300,75,70);
 park(610,420,110,95);park(-650,-420,115,90);
 // Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
- const g=new T.Group();g.position.set(x,0,z);scene.add(g);
+ const g=new T.Group();g.position.set(x,0,z);world.add(g);
  const wallMat=mat(color),roofMat=mat(roofColor),windowMat=new T.MeshStandardMaterial({color:0x9bc6d0,roughness:.28,metalness:.12});
  cube(g,0,h/2,0,w,h,d,wallMat);
  cube(g,0,h+.18,0,w+1.4,.38,d+1.4,roofMat);
@@ -136,7 +138,7 @@ function trees(x,z,count=4,spread=10){
  for(let i=0;i<count;i++){
   const px=x+(i%2?1:-1)*(spread*.3)+(i%3-1)*spread*.12;
   const pz=z+(i%2?-.5:.5)*spread*.35;
-  const g=new T.Group();g.position.set(px,0,pz);scene.add(g);
+  const g=new T.Group();g.position.set(px,0,pz);world.add(g);
   cube(g,0,.28,0,.18,.56,.18,M.trunk);
   const crown=cube(g,0,.72,0,.65,.65,.65,i%2?M.tree:M.tree2);
   crown.rotation.y=.25;
@@ -152,7 +154,7 @@ function label(text,x,z,emoji=""){
  ctx.fillStyle="#fff";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(title,256,65,width-30);
  const tex=new T.CanvasTexture(c);tex.colorSpace=T.SRGBColorSpace;
  const sprite=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
- sprite.position.set(x,7,z);sprite.scale.set(17,4.25,1);sprite.renderOrder=20;scene.add(sprite);
+ sprite.position.set(x,7,z);sprite.scale.set(17,4.25,1);sprite.renderOrder=20;world.add(sprite);
  return sprite;
 }
 const places=[
@@ -193,7 +195,7 @@ function landmarkDetails(p){
   cube(scene,x,17.2,z,5,3,5,mat(0x53634f));
   for(const [dx,dz] of [[-7,-5],[7,-5],[-7,5],[7,5]]){
    cube(scene,x+dx,8,z+dz,3.2,16,3.2,mat(0xd9c8a8));
-   const roof=new T.Mesh(new T.ConeGeometry(2.6,5,4),mat(0x425a4b));roof.position.set(x+dx,18.5,z+dz);scene.add(roof);
+   const roof=new T.Mesh(new T.ConeGeometry(2.6,5,4),mat(0x425a4b));roof.position.set(x+dx,18.5,z+dz);world.add(roof);
   }
   for(let i=-2;i<=2;i++)cube(scene,x+i*3,11,z+7.65,1.2,5,.25,M.glass);
   return;
@@ -218,7 +220,7 @@ function landmarkDetails(p){
  if(p.id==="university"){
   building(x,z,20,15,8,0xc9c1ae,0x555b58,"heritage");
   cube(scene,x,13,z,6,10,6,mat(0x777568));
-  const roof=new T.Mesh(new T.ConeGeometry(4.2,5,4),mat(0x46534c));roof.position.set(x,20,z);scene.add(roof);
+  const roof=new T.Mesh(new T.ConeGeometry(4.2,5,4),mat(0x46534c));roof.position.set(x,20,z);world.add(roof);
   for(let i=-3;i<=3;i++)cube(scene,x+i*2.5,5,z+7.7,1.1,4,.25,M.glass);return;
  }
  if(p.id==="diefenbaker"){
@@ -228,7 +230,7 @@ function landmarkDetails(p){
  }
  if(p.id==="farmers"){
   building(x,z,21,16,5,0xd8d0b9,0x9a6749,"market");
-  const canopy=new T.Mesh(new T.ConeGeometry(12,4,4),mat(0x9b6849));canopy.rotation.y=Math.PI/4;canopy.position.set(x,8,z);scene.add(canopy);
+  const canopy=new T.Mesh(new T.ConeGeometry(12,4,4),mat(0x9b6849));canopy.rotation.y=Math.PI/4;canopy.position.set(x,8,z);world.add(canopy);
   for(let i=-3;i<=3;i++)cube(scene,x+i*2.5,2.7,z+8.2,1.2,4,.2,M.glass);return;
  }
  if(p.id==="westernmuseum"){
@@ -281,7 +283,7 @@ for(const [cx,cz] of [[330,-430],[570,80],[-270,160],[270,-150],[-650,430],[650,
 }
 // Local street boards along main roads
 function roadSign(x,z,txt){
- const g=new T.Group();g.position.set(x,0,z);scene.add(g);
+ const g=new T.Group();g.position.set(x,0,z);world.add(g);
  cube(g,0,1.1,0,.25,2.2,.25,M.dark);
  cube(g,0,2.2,0,6.8,1.35,.22,M.sign);
  const c=document.createElement("canvas");c.width=512;c.height=128;const ctx=c.getContext("2d");
@@ -293,7 +295,7 @@ trees(-50,64,7,14);trees(54,46,7,14);trees(-92,8,7,12);trees(94,-8,7,12);
 // Living streets: leafy parks, tiny pedestrians and moving traffic.
 const iTreeMats=[mat(0x398653),mat(0x579c5d),mat(0x78ad68),mat(0x2f754c)];
 function streetTree(x,z,scale=1){
- const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
+ const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);
  const trunk=new T.Mesh(new T.CylinderGeometry(.16,.22,1.35,6),M.trunk);trunk.position.y=.68;trunk.castShadow=true;g.add(trunk);
  const crown=new T.Mesh(new T.IcosahedronGeometry(1.2,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=2.05;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
  const crown2=new T.Mesh(new T.IcosahedronGeometry(.82,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.48,2.42,.12);crown2.castShadow=true;g.add(crown2);
@@ -312,7 +314,7 @@ const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),ma
 const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
 const pedestrians=[];
 function addPedestrian(x,z,index,dx,dz){
- const g=new T.Group();g.position.set(x,0,z);g.rotation.y=Math.atan2(dx,dz);g.scale.setScalar(1.35);scene.add(g);
+ const g=new T.Group();g.position.set(x,0,z);g.rotation.y=Math.atan2(dx,dz);g.scale.setScalar(1.35);world.add(g);
  const shirt=pedestrianMats[index%pedestrianMats.length],skin=skinMats[index%skinMats.length],pants=mat(index%2?0x39475c:0x45413b);
  cube(g,0,1.05,0,.48,.68,.28,shirt);cube(g,0,1.62,0,.34,.38,.34,skin);cube(g,0,1.82,-.015,.35,.12,.35,mat(0x40352f));
  const leftArm=cube(g,-.31,1.05,0,.16,.56,.17,shirt),rightArm=cube(g,.31,1.05,0,.16,.56,.17,shirt);
@@ -325,7 +327,7 @@ walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
 const carWindow=new T.MeshStandardMaterial({color:0x9dcbd3,roughness:.22,metalness:.12});
 function addCar(axis,fixed,position,direction,index){
- const g=new T.Group();g.scale.setScalar(1.35);scene.add(g);const paint=mat(carPaint[index%carPaint.length]);
+ const g=new T.Group();g.scale.setScalar(1.35);world.add(g);const paint=mat(carPaint[index%carPaint.length]);
  cube(g,0,.52,0,1.25,.62,2.35,paint);cube(g,0,.98,-.12,.98,.55,1.18,carWindow);cube(g,0,.92,.83,1.05,.24,.42,paint);
  for(const side of [-1,1])for(const end of [-.72,.72]){const wheel=new T.Mesh(new T.CylinderGeometry(.24,.24,.16,10),tireMat);wheel.rotation.z=Math.PI/2;wheel.position.set(side*.66,.27,end);wheel.castShadow=true;g.add(wheel);}
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
@@ -334,7 +336,7 @@ function addCar(axis,fixed,position,direction,index){
 for(let i=0;i<8;i++){const road=-600+i*200;addCar("z",road,-610+(i%3)*150,i%2?1:-1,i);const crossRoad=-600+i*200;addCar("x",crossRoad,-820+(i%4)*360,i%2?-1:1,i+2);}
 
 // Player marker with simple blocky avatar
-const player={x:0,z:-112,yaw:0};const avatar=new T.Group();scene.add(avatar);
+const player={x:0,z:-112,yaw:0};const avatar=new T.Group();world.add(avatar);
 cube(avatar,0,1,0,1,1.2,.65,mat(0x368dc4));
 cube(avatar,0,1.95,0,.78,.75,.7,mat(0xc9906d));
 cube(avatar,0,2.35,0,.8,.2,.72,mat(0x302b29));
@@ -342,10 +344,10 @@ cube(avatar,-.27,.3,0,.34,.65,.42,mat(0x35415d));cube(avatar,.27,.3,0,.34,.65,.4
 const locationById=Object.fromEntries(places.map(p=>[p.id,p]));
 const placeLabels=[],placeHitAreas=[];
 for(const p of places){
- const labelSprite=scene.children.find(o=>o.isSprite && o.position.x===p.x && o.position.z===p.z-24);
+ const labelSprite=world.children.find(o=>o.isSprite && o.position.x===p.x && o.position.z===p.z-24);
  if(labelSprite){labelSprite.material.opacity=0;labelSprite.material.transparent=true;labelSprite.scale.set(0,0,1);placeLabels.push({place:p,sprite:labelSprite,active:false});}
  const hit=new T.Mesh(new T.PlaneGeometry(48,42),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));
- hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;scene.add(hit);placeHitAreas.push(hit);
+ hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;world.add(hit);placeHitAreas.push(hit);
 }
 const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
 let hoveredPlace=null,pointerX=0,pointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
@@ -457,7 +459,7 @@ function frame(t){
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
- if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  CITY MAP ~18 × 13 KM";
+ if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  CITY MAP ~9 × 6.5 KM";
 
 }
 requestAnimationFrame(frame);
