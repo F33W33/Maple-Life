@@ -8,7 +8,7 @@ host.innerHTML="";
 
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0xc4d7a2);
-const camera=new T.PerspectiveCamera(48,1,.1,5000);camera.position.set(0,210,230);
+const camera=new T.PerspectiveCamera(48,1,.1,6000);camera.position.set(0,1500,1100);
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
 renderer.shadowMap.enabled=true;
@@ -58,7 +58,7 @@ updateSaskatoonLighting();
 setInterval(updateSaskatoonLighting,15000);
 const mat=c=>new T.MeshLambertMaterial({color:c});
 const M={
-land:mat(0xb9d99a),grass:mat(0x8fc879),grass2:mat(0xa8d58b),road:mat(0x59636a),
+land:mat(0x86c96b),grass:mat(0x86c96b),grass2:mat(0x86c96b),road:mat(0x59636a),
 roadEdge:mat(0xe5dfc9),water:mat(0x258fca),waterLight:mat(0x72d0e5),
 path:mat(0xe8dfc8),roof:mat(0x46515b),roof2:mat(0x786b61),
 wall:mat(0xe6dfc9),white:mat(0xf4efdf),glass:mat(0x8bb9c4),
@@ -96,8 +96,8 @@ for(const x of [-200,0,200]){
  for(let z=-13;z<=13;z+=6)cube(scene,x,.48,z,9.4,.12,.45,M.white);
 }
 function park(x,z,w,d){
- slab(x,z,w,d,M.grass2,-.02,.22);
- slab(x,z,w*.7,.8,M.path,.14,.12);
+ // Keep park lawns continuous with the surrounding green terrain.
+ slab(x,z,w*.7,.8,M.path,.02,.08);
  slab(x,z,w*.8,.8,M.path,.14,.12).rotation.y=Math.PI/2;
 }
 park(-350,220,85,75);park(370,180,95,82);park(190,-300,90,78);
@@ -377,7 +377,13 @@ window.addEventListener("blur",()=>{
 function resize(){
  const r=host.getBoundingClientRect();if(!r.width||!r.height)return;
  renderer.setSize(r.width,r.height,false);
- camera.aspect=r.width/r.height;camera.updateProjectionMatrix();
+ const aspect=r.width/r.height;
+ camera.aspect=aspect;
+ const projectedMapHeight=Math.max(WORLD_D*.8,WORLD_W*.8/aspect)*1.2;
+ const distance=projectedMapHeight/(2*Math.tan(T.MathUtils.degToRad(camera.fov/2)));
+ camera.position.set(0,distance*.8,distance*.6);
+ camera.lookAt(0,0,0);
+ camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(host);resize();
 function nearest(){
@@ -420,12 +426,9 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const lookAheadX=pointerX*72,lookAheadZ=pointerY*58;
- viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);
- viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);
- const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
- camera.position.set(targetX+Math.sin(cameraAngle)*155,190,targetZ+Math.cos(cameraAngle)*175);
- camera.lookAt(targetX,3,targetZ);
+
+ // Fixed city overview: the whole map stays framed without cursor movement.
+ camera.lookAt(0,0,0);
  for(const item of placeLabels){
   const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
   if(active!==item.active)item.active=active;
