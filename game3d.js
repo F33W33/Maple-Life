@@ -134,16 +134,7 @@ function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  cube(g,0,2.8,d/2+.45,Math.min(4,w*.36),.35,1,roofMat);
  return g;
 }
-function trees(x,z,count=4,spread=10){
- for(let i=0;i<count;i++){
-  const px=x+(i%2?1:-1)*(spread*.3)+(i%3-1)*spread*.12;
-  const pz=z+(i%2?-.5:.5)*spread*.35;
-  const g=new T.Group();g.position.set(px,0,pz);world.add(g);
-  cube(g,0,.28,0,.18,.56,.18,M.trunk);
-  const crown=cube(g,0,.72,0,.65,.65,.65,i%2?M.tree:M.tree2);
-  crown.rotation.y=.25;
- }
-}
+function trees(){ /* Tree count is controlled by the exact fifty-tree placement below. */ }
 function label(text,x,z,emoji=""){
  const c=document.createElement("canvas");c.width=512;c.height=128;
  const ctx=c.getContext("2d");ctx.clearRect(0,0,512,128);
