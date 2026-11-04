@@ -8,7 +8,7 @@ host.innerHTML="";
 
 const T=THREE,scene=new T.Scene(),world=new T.Group();
 scene.add(world);
-world.scale.setScalar(.5);
+world.scale.setScalar(.35);
 scene.background=new T.Color(0xc4d7a2);
 const camera=new T.PerspectiveCamera(48,1,.1,6000);camera.position.set(0,1500,1100);
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
@@ -252,16 +252,19 @@ function landmarkDetails(p){
  if(p.type==="shopping"){building(x,z,23,17,7,0xe3e0d7,0x77736a,"modern");return;}
  building(x,z,12,10,6,0xd8d1c2,0x65666a,"block");
 }
-for(const p of places){
- landmarkDetails(p);
- if(p.type!=="park"&&p.type!=="neighbourhood")trees(p.x-22,p.z+20,3,8);
+// Keep exactly ten visible buildings in this compact town.
+places.length=10;
+for(let i=0;i<10;i++){
+ const p=places[i];
+ const palette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1];
+ building(p.x,p.z,10+(i%3)*2,9+(i%2)*2,6+(i%4)*1.5,palette[i%palette.length],0x625f5a,i%3===0?"heritage":"block");
  label(p.short,p.x,p.z-24,p.emoji);
 }
 // Tighter downtown blocks: compact homes and shops fill the gaps between
 // the existing landmarks while staying clear of the river, parks and landmarks.
 const infillPalette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1,0xd0c0ad,0xbfcfc7];
 let infillIndex=0;
-for(let x=-130;x<=130;x+=20){
+for(let x=999;x<=130;x+=20){
  for(let z=-150;z<=150;z+=20){
   if(Math.abs(z)<25)continue;
   const nearLandmark=places.some(p=>p.type!=="neighbourhood"&&Math.hypot(p.x-(x+10),p.z-(z+10))<24);
@@ -274,7 +277,7 @@ for(let x=-130;x<=130;x+=20){
  }
 }
 // A few denser residential clusters extend the built-up feel beyond downtown.
-for(const [cx,cz] of [[330,-430],[570,80],[-270,160],[270,-150],[-650,430],[650,480]]){
+for(const [cx,cz] of []){
  for(let ix=-1;ix<=1;ix++)for(let iz=-1;iz<=1;iz++){
   if(ix===0&&iz===0)continue;
   const j=Math.abs(ix*3+iz+4);
@@ -300,8 +303,11 @@ function streetTree(x,z,scale=1){
  const crown=new T.Mesh(new T.IcosahedronGeometry(1.2,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=2.05;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
  const crown2=new T.Mesh(new T.IcosahedronGeometry(.82,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.48,2.42,.12);crown2.castShadow=true;g.add(crown2);
 }
-for(const [x,z,n] of [[-350,220,22],[370,180,25],[190,-300,20],[-360,-280,22],[60,280,18],[-170,300,18],[610,420,28],[-650,-420,28],[-50,64,10],[54,46,10],[-92,8,10],[94,-8,10]]){
- for(let i=0;i<n;i++){const a=i*2.399963,rad=4+Math.sqrt(i)*2.2;streetTree(x+Math.cos(a)*rad,z+Math.sin(a)*rad,.72+(i%4)*.1);}
+// Exactly fifty trees, arranged in a compact 10-by-5 town grove.
+for(let i=0;i<50;i++){
+ const x=((i%10)-4.5)*18;
+ const z=(Math.floor(i/10)-2)*24;
+ streetTree(x,z,.8);
 }
 // Pavement strips and dashed markings make the larger avenues read as streets.
 const sidewalkMat=mat(0xc9c6b8),markingMat=mat(0xe9e4ce);
@@ -322,7 +328,7 @@ function addPedestrian(x,z,index,dx,dz){
  pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx, dz});
 }
 const walkingRoutes=[[-8,-26,1,0],[-5,-26,1,0],[-2,-26,1,0],[5,-26,-1,0],[8,-26,-1,0],[-30,-26,0,1],[-30,-22,0,1],[-30,26,0,-1],[30,26,0,-1],[-48,24,1,0],[-44,24,1,0],[42,-26,-1,0],[46,-26,-1,0],[-350,220,1,0],[370,180,0,1],[190,-300,-1,0],[-360,-280,0,-1],[60,280,1,0],[-170,300,-1,0],[610,420,0,1],[-650,-420,1,0]];
-walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
+walkingRoutes.slice(0,20).forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
 // Colourful compact cars cruise the main roads in both directions.
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
 const carWindow=new T.MeshStandardMaterial({color:0x9dcbd3,roughness:.22,metalness:.12});
@@ -333,7 +339,7 @@ function addCar(axis,fixed,position,direction,index){
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
  cars.push({group:g,axis,fixed:fixed+(direction>0?-.58:.58),position,direction,speed:2.2+(index%4)*.35});
 }
-for(let i=0;i<8;i++){const road=-600+i*200;addCar("z",road,-610+(i%3)*150,i%2?1:-1,i);const crossRoad=-600+i*200;addCar("x",crossRoad,-820+(i%4)*360,i%2?-1:1,i+2);}
+for(let i=0;i<5;i++){const road=-400+i*200;addCar("z",road,-310+(i%3)*150,i%2?1:-1,i);}
 
 // Player marker with simple blocky avatar
 const player={x:0,z:-112,yaw:0};const avatar=new T.Group();world.add(avatar);
@@ -459,7 +465,7 @@ function frame(t){
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
- if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  CITY MAP ~9 × 6.5 KM";
+ if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  TINY TOWN · 10 BUILDINGS";
 
 }
 requestAnimationFrame(frame);
