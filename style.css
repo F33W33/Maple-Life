@@ -216,3 +216,37 @@ body.auth-complete #authScreen{display:none}
 body:has(#mapleGame:target) #authScreen{display:none!important}
 .auth-primary,.auth-secondary{text-decoration:none;box-sizing:border-box}
 .auth-secondary{text-align:center}
+
+
+/* Collapsible in-game navigation */
+#mapleGame .life-sidebar{position:absolute;z-index:30;left:16px;top:50%;transform:translateY(-50%);width:202px;max-height:calc(100% - 36px);overflow:visible;display:flex;flex-direction:column;gap:5px;padding:15px 12px 13px;background:rgba(250,252,247,.96);border:1px solid #e1eadb;border-radius:22px;box-shadow:0 10px 35px #1d38252b;backdrop-filter:blur(14px);transition:width .22s,padding .22s}
+#mapleGame .life-sidebar-toggle{position:absolute;right:-15px;top:16px;width:30px;height:30px;border:2px solid #fff;border-radius:50%;background:#6544df;color:white;font-size:23px;line-height:20px;box-shadow:0 3px 9px #192b2540;cursor:pointer}
+#mapleGame .life-sidebar-brand{display:flex;align-items:center;gap:9px;padding:2px 7px 12px;color:#263c2e;font-size:12px;letter-spacing:1px}
+#mapleGame .life-sidebar-brand span{font-size:24px}
+#mapleGame .life-sidebar-label{padding:8px 9px 5px;color:#8a9988;font-size:8px;font-weight:900;letter-spacing:1.3px}
+#mapleGame .life-menu-item{display:flex;align-items:center;gap:12px;width:100%;min-height:43px;padding:8px 10px;border:0;border-radius:13px;background:transparent;color:#354538;text-align:left;font-size:12px}
+#mapleGame .life-menu-item span{width:25px;flex:none;text-align:center;font-size:21px}
+#mapleGame .life-menu-item b{font-weight:750;white-space:nowrap}
+#mapleGame .life-menu-item:hover,#mapleGame .life-menu-item.active{background:#e8e6ff;color:#4e36bd}
+#mapleGame .life-sidebar-spacer{min-height:8px;flex:1}
+#mapleGame .life-sidebar-hotbar{border-top:1px solid #e8eee4;margin-top:7px;padding-top:6px}
+#mapleGame .life-quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:3px}
+#mapleGame .life-quick-grid button{height:36px;border:1px solid #e0e9da;border-radius:10px;background:white;font-size:18px;box-shadow:0 2px 0 #dce6d7}
+#mapleGame .life-sidebar.collapsed{width: sixty; width:62px;padding:13px 8px}
+#mapleGame .life-sidebar.collapsed .life-sidebar-brand b,#mapleGame .life-sidebar.collapsed .life-sidebar-label,#mapleGame .life-sidebar.collapsed .life-menu-item b,#mapleGame .life-sidebar.collapsed .life-sidebar-hotbar{display:none}
+#mapleGame .life-sidebar.collapsed .life-sidebar-brand{justify-content:center;padding:0 0 8px}
+#mapleGame .life-sidebar.collapsed .life-menu-item{justify-content:center;padding:8px 0}
+#mapleGame .life-sidebar.collapsed .life-menu-item span{font-size:22px}
+#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-13px}
+#mapleGame .game-hotbar{display:none}
+#mapleGame .game-objectives{left:232px}
+#mapleGame .game-minimap{left:232px}
+@media(max-width:760px){
+ #mapleGame .life-sidebar{left:7px;width:178px;top:76px;transform:none;max-height:calc(100% - 155px);padding:10px 8px;border-radius:17px}
+ #mapleGame .life-sidebar-brand{padding-bottom:5px}
+ #mapleGame .life-menu-item{min-height:36px;font-size:10px}
+ #mapleGame .life-menu-item span{font-size:18px}
+ #mapleGame .life-sidebar.collapsed{width:51px;padding:9px 6px}
+ #mapleGame .game-objectives{left:194px;top:9px;width:145px}
+ #mapleGame .game-minimap{left:8px;bottom:8px}
+}
