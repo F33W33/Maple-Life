@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js" defer></script>
+  <script src="world3d.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -73,6 +75,19 @@
       <section id="cityView" class="view">
         <div class="page-heading"><div><div class="eyebrow">THERE'S A WHOLE WORLD OUT THERE</div><h1>Explore <em>Maplewood.</em></h1><p>A little city with a lot to discover. Where will you go first?</p></div><div class="city-weather">🌤️ <span>18°C <small>Feels like a good day</small></span></div></div>
         <div class="city-banner"><div class="city-banner-copy"><span class="hero-kicker">YOUR NEIGHBOURHOOD</span><h2>Make yourself<br>at home.</h2><p>Discover local spots, meet the city, and find your favourite places.</p></div><div class="city-illustration"><div class="city-sun"></div><div class="city-block block-a"></div><div class="city-block block-b"></div><div class="city-block block-c"></div><div class="city-block block-d"></div><div class="city-road"></div></div></div>
+        <div class="maple-3d-panel">
+          <div class="maple-3d-heading"><div><span class="eyebrow">A WORLD YOU CAN WALK THROUGH</span><h2>Maplewood in 3D</h2><p>Take a stroll around your neighbourhood.</p></div><span class="maple-3d-live"><i></i> LIVE WORLD</span></div>
+          <div class="maple-3d-stage" id="maple3dStage">
+            <canvas id="maple3dCanvas" aria-label="Three-dimensional view of Maplewood"></canvas>
+            <div class="maple-3d-hud"><span class="maple-3d-location">🍁 MAPLEWOOD, CANADA</span><span id="maple3dPosition">NEIGHBOURHOOD</span></div>
+            <div class="maple-3d-destinations" aria-label="Quick destinations">
+              <button type="button" data-world-place="cafe">☕ Café</button><button type="button" data-world-place="park">🌲 Park</button><button type="button" data-world-place="market">🛒 Market</button><button type="button" data-world-place="library">📚 Library</button>
+            </div>
+            <div class="maple-3d-controls" aria-hidden="true"><span>W A S D <small>MOVE</small></span><span>↑ ↓ ← → <small>MOVE</small></span><span>DRAG <small>LOOK</small></span></div>
+            <div class="maple-3d-crosshair">+</div>
+          </div>
+          <div class="maple-3d-footer"><span><b>Explore freely.</b> Use WASD or arrow keys to walk. Drag the scene to look around.</span><span id="maple3dStatus">Ready to explore</span></div>
+        </div>
         <div class="section-heading"><div><div class="eyebrow">PICK A DESTINATION</div><h2>Places around town</h2></div></div>
         <div class="places-grid" id="placesGrid">
           <article class="place-card"><div class="place-art cafe-art">☕<span>OPEN</span></div><div class="place-copy"><div class="place-type">FOOD & DRINK</div><h3>Northstar Café</h3><p>A cosy spot for coffee and a fresh pastry.</p><button class="outline-button" data-place="cafe">Visit place <span>→</span></button></div></article>
