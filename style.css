@@ -297,3 +297,10 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .life-sidebar:not(.collapsed) .life-sidebar-toggle::before{transform:rotate(225deg)}
 #mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-15px}
 #mapleGame .life-sidebar-toggle:focus-visible{outline:3px solid #b9adff;outline-offset:3px}
+
+
+/* Keep the in-game clock separate from the topbar's Maplewood day counter. */
+#mapleGame .game-date-pill{position:relative;inset:auto;z-index:auto;display:flex;align-items:center;white-space:nowrap}
+#mapleGame .life-sidebar-toggle{top:-12px!important;right:-10px!important}
+#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{top:-12px!important;right:-10px!important}
+@media(max-width:760px){#mapleGame .game-date-pill{display:none}}
