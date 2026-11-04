@@ -100,8 +100,7 @@
     updateHomeButtons();
     updateTaskCards();
     saveState();
-    if (!state.name) $("#welcomeModal").classList.add("open");
-    else $("#welcomeModal").classList.remove("open");
+    $("#welcomeModal").classList.remove("open");
   }
 
   function openProfileEditor() {
@@ -328,6 +327,16 @@
   function openGamePanel(type){const panel=$("#gamePanel"),content=$("#gamePanelContent");if(!panel||!content)return;const btn=(label,action)=>'<button class="panel-choice" data-panel-action="'+action+'">'+label+'</button>';let body="";if(type==="phone")body="<h2>📱 My phone</h2><p>Your Maple Life pocket helper.</p>"+btn("💼 Careers & jobs","jobs")+btn("🛍️ Marketplace","shop")+btn("🏠 My home","home-life")+btn("💳 Wallet & bank","wallet");else if(type==="inventory")body="<h2>🎒 Inventory</h2><p>"+(state.inventory.length?state.inventory.map(x=>x.icon+" "+x.name).join("<br>"):"Your backpack is empty. Visit the marketplace to pick up supplies.")+"</p>"+btn("Visit marketplace","shop");else if(type==="profile")body="<h2>🙂 "+(state.name||"Your character")+"</h2><p>"+(state.province||"Saskatchewan")+" · "+(state.job?state.job.title:"Unemployed")+"</p>"+btn("Edit character","profile-edit");else body="<h2>🍁 Maple Life menu</h2><p>Where would you like to go?</p>"+btn("💼 Careers & jobs","jobs")+btn("🏠 My home","home-life")+btn("🛍️ Marketplace","shop")+btn("💳 Wallet & bank","wallet")+btn("📱 Character profile","profile");content.innerHTML=body;panel.classList.add("open");}
   document.addEventListener("click",e=>{const t=e.target.closest("[data-game-panel]");if(t){openGamePanel(t.dataset.gamePanel);return;}const hot=e.target.closest("[data-hotbar]");if(hot){const a=hot.dataset.hotbar;if(a==="eat")activity("eat");else if(a==="coffee")activity("coffee");else if(a==="rest")activity("rest");else openGamePanel(a);return;}const a=e.target.closest("[data-panel-action]");if(a){const v=a.dataset.panelAction;$("#gamePanel").classList.remove("open");if(v==="profile-edit"){openProfileEditor();return;}navigate(v);}});
   $("#gamePanelClose")?.addEventListener("click",()=>$("#gamePanel").classList.remove("open"));
+  document.querySelectorAll("[data-enter-game]").forEach(button => {
+    button.addEventListener("click", () => {
+      if (!state.name) state.name = "New Resident";
+      saveState();
+      render();
+      document.body.classList.add("auth-complete");
+      gameToast(button.dataset.enterGame === "signup" ? "Welcome to Maple Life! Let's get started." : "Welcome back! Enjoy your Maple Life.");
+    });
+  });
+
   document.addEventListener("maple:interact",e=>{const id=e.detail?.id;if(["jobs","home-life","shop","wallet"].includes(id)){navigate(id);gameToast("Welcome!");}else if(["cafe","park","market","library","square"].includes(id)){openPlace(id);}else if(id==="police")gameToast("Maplewood Police Station");});
   document.addEventListener("maple:game-toast",e=>gameToast(e.detail?.message||""));
   const oldRender=render;render=function(){oldRender();renderGameHud();};
