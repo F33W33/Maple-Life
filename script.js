@@ -341,6 +341,14 @@
   document.addEventListener("maple:game-toast",e=>gameToast(e.detail?.message||""));
   const oldRender=render;render=function(){oldRender();renderGameHud();};
 
+
+  const lifeSidebar=$("#lifeSidebar"),lifeSidebarToggle=$("#lifeSidebarToggle");
+  lifeSidebarToggle?.addEventListener("click",()=>{
+    const collapsed=lifeSidebar.classList.toggle("collapsed");
+    lifeSidebarToggle.textContent=collapsed?"›":"‹";
+    lifeSidebarToggle.setAttribute("aria-expanded",String(!collapsed));
+    lifeSidebarToggle.setAttribute("aria-label",collapsed?"Expand menu":"Collapse menu");
+  });
   render();
   if (state.name) $("#welcomeModal").classList.remove("open");
 })();
