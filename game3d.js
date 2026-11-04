@@ -105,19 +105,19 @@ park(610,420,110,95);park(-650,-420,115,90);
 // Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  const g=new T.Group();g.position.set(x,0,z);scene.add(g);
- cube(g,0,h/2,0,w,h,d,mat(color));
- cube(g,0,h+.18,0,w+.7,.35,d+.7,mat(roofColor));
+ cube(g,0,h/2,0,w*.28,h*.28,d*.28,mat(color));
+ cube(g,0,h*.28+.18,0,w*.28+.2,.35,d*.28+.2,mat(roofColor));
  if(style==="tower"){
-   cube(g,0,h+.85,0,w*.58,1.2,d*.58,mat(color));
-   cube(g,0,h+1.5,0,w*.22,.22,d*.22,mat(roofColor));
+   cube(g,0,h*.28+.85,0,w*.16,1.2,d*.16,mat(color));
+   cube(g,0,h*.28+1.5,0,w*.06,.22,d*.06,mat(roofColor));
  }
  if(style==="heritage"){
-   cube(g,0,h+.45,0,w*.28,.65,d*.28,mat(roofColor));
-   cube(g,-w*.28,h*.55,d/2+.08,w*.23,h*.55,.12,M.glass);
-   cube(g,w*.28,h*.55,d/2+.08,w*.23,h*.55,.12,M.glass);
+   cube(g,0,h*.28+.45,0,w*.08,.65,d*.08,mat(roofColor));
+   cube(g,-w*.28,h*.28*.55,d*.14+.08,w*.064,h*.28*.55,.12,M.glass);
+   cube(g,w*.28,h*.28*.55,d*.14+.08,w*.064,h*.28*.55,.12,M.glass);
  }
  for(let xx=-w*.32;xx<=w*.32;xx+=w*.32){
-   cube(g,xx,h*.55,d/2+.08,Math.max(.8,w*.19),Math.max(1,h*.28),.13,M.glass);
+   cube(g,xx*.28,h*.28*.55,d*.14+.08,Math.max(.35,w*.053),Math.max(.5,h*.078),.13,M.glass);
  }
  return g;
 }
@@ -126,8 +126,8 @@ function trees(x,z,count=4,spread=10){
   const px=x+(i%2?1:-1)*(spread*.3)+(i%3-1)*spread*.12;
   const pz=z+(i%2?-.5:.5)*spread*.35;
   const g=new T.Group();g.position.set(px,0,pz);scene.add(g);
-  cube(g,0,1.1,0,.55,2.2,.55,M.trunk);
-  const crown=cube(g,0,2.8,0,2.5,2.5,2.5,i%2?M.tree:M.tree2);
+  cube(g,0,.28,0,.18,.56,.18,M.trunk);
+  const crown=cube(g,0,.72,0,.65,.65,.65,i%2?M.tree:M.tree2);
   crown.rotation.y=.25;
  }
 }
@@ -341,7 +341,7 @@ function frame(t){
  let dx=0,dz=0;if(keys.KeyW||keys.ArrowUp)dz-=1;if(keys.KeyS||keys.ArrowDown)dz+=1;
  if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;
  const len=Math.hypot(dx,dz);
- if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?2.2:1.2;
+ if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?.55:.22;
  player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-880,880);
  player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-630,630);walk+=dt*speed;
  player.yaw=Math.atan2(dx,dz);
