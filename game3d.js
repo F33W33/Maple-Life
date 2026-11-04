@@ -5,7 +5,7 @@ if(!root||!window.THREE)return;
 const host=document.getElementById("maple3d");
 if(!host)return;
 host.innerHTML="";
-const mini=document.getElementById("mapleMiniMap"),mc=mini?.getContext("2d");
+
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0xc4d7a2);
 const camera=new T.OrthographicCamera(-70,70,48,-48,.1,400);
@@ -20,11 +20,11 @@ scene.add(new T.HemisphereLight(0xffffff,0x82966b,2.1));
 const sun=new T.DirectionalLight(0xffffff,1.8);sun.position.set(-45,100,35);scene.add(sun);
 const mat=c=>new T.MeshLambertMaterial({color:c});
 const M={
-land:mat(0xb9cf91),grass:mat(0x9fbe7a),grass2:mat(0xa9c98b),road:mat(0x858b83),
-roadEdge:mat(0xd2d0b6),water:mat(0x55a9c8),waterLight:mat(0x77c2d4),
-path:mat(0xd8d2b7),roof:mat(0x58606a),roof2:mat(0x786b61),
+land:mat(0xb9d99a),grass:mat(0x8fc879),grass2:mat(0xa8d58b),road:mat(0x59636a),
+roadEdge:mat(0xe5dfc9),water:mat(0x258fca),waterLight:mat(0x72d0e5),
+path:mat(0xe8dfc8),roof:mat(0x46515b),roof2:mat(0x786b61),
 wall:mat(0xe6dfc9),white:mat(0xf4efdf),glass:mat(0x8bb9c4),
-brick:mat(0xb98770),dark:mat(0x343c40),tree:mat(0x438d69),
+brick:mat(0xb66e50),dark:mat(0x343c40),tree:mat(0x368b58),
 tree2:mat(0x68a66d),trunk:mat(0x82664a),sign:mat(0x18252b),
 bridge:mat(0xb9b7a8),parking:mat(0x9da39b)
 };
@@ -36,6 +36,13 @@ slab(0,0,260,190,M.land,-.6,1);
 const roadX=[-100,-68,-36,0,36,68,100],roadZ=[-72,-42,-12,18,48,78];
 for(const x of roadX){slab(x,0,7,185,M.road,-.08,.18);slab(x-4.1,0,1.1,185,M.roadEdge,-.03,.12);slab(x+4.1,0,1.1,185,M.roadEdge,-.03,.12);}
 for(const z of roadZ){slab(0,z,255,7,M.road,-.08,.18);slab(0,z-4.1,255,1.1,M.roadEdge,-.03,.12);slab(0,z+4.1,255,1.1,M.roadEdge,-.03,.12);}
+// Painted lane dividers, pedestrian crossings and sidewalks
+const lanePaint=mat(0xf5e9b9),crossPaint=mat(0xf7f4e8),sidewalk=mat(0xc9c5b3);
+for(const x of roadX){for(let z=-82;z<=82;z+=12)slab(x,z,.22,5.2,lanePaint,.045,.035);slab(x-5.2,0,1.1,185,sidewalk,.02,.12);slab(x+5.2,0,1.1,185,sidewalk,.02,.12);}
+for(const z of roadZ){for(let x=-118;x<=118;x+=12)slab(x,z,5.2,.22,lanePaint,.045,.035);slab(0,z-5.2,255,1.1,sidewalk,.02,.12);slab(0,z+5.2,255,1.1,sidewalk,.02,.12);}
+function crosswalk(x,z,vertical){for(let i=-3;i<=3;i++)slab(x+(vertical?i*1.05:0),z+(vertical?0:i*1.05),vertical?.62:7,vertical?7:.62,crossPaint,.06,.045);}
+for(const x of [-68,-36,0,36,68])for(const z of [-42,-12,18,48])crosswalk(x,z,true);
+for(const z of [-42,-12,18,48])for(const x of [-68,-36,0,36,68])crosswalk(x,z,false);
 // South Saskatchewan River runs through the centre of the map
 slab(0,0,260,25,M.water,-.05,.22);
 slab(0,-13.2,260,.65,M.waterLight,.03,.08);
@@ -128,14 +135,14 @@ for(const p of places){
   building(p.x,p.z,13,12,11,0xe4e3dc,0x5b6870,"tower");
   cube(scene,p.x,p.z+6.1,p.z,0.1,.1,.1,M.white);
  }else if(p.type==="hotel"){
-  building(p.x,p.z,13,10,14,0xe0d3b7,0x4f5960,"heritage");
+  building(p.x,p.z,13,10,14,0xe0d3b7,0x496b59,"heritage");
  }else if(p.type==="museum"){
-  building(p.x,p.z,14,11,7,0xd5d0c4,0x474d55,"block");
+  building(p.x,p.z,14,11,7,0xe8e5dc,0x474d55,"modern");
   cube(scene,p.x,p.z+4,p.z,5,1,2,M.white);
  }else if(p.type==="shopping"||p.type==="market"){
-  building(p.x,p.z,16,12,5,0xd9d2c0,0x77736a);
+  building(p.x,p.z,19,14,6,0xe2e0d8,0x77736a,p.type==="shopping"?"modern":"block");
  }else if(p.type==="district"){
-  for(let i=0;i<4;i++)building(p.x+(i-1.5)*7,p.z+(i%2)*7,5,5,4+i%2,0xd7c7ae,0x6c6259);
+  for(let i=0;i<5;i++)building(p.x+(i-2)*6,p.z+(i%2)*6,5,5,4+i%2,[0xd9b99a,0xc98f78,0xe2cda8,0xc4d1c4,0xd8b9a7][i],0x6c6259,"heritage");
  }else{
   building(p.x,p.z,12,10,6,0xd8d1c2,0x65666a);
  }
@@ -195,15 +202,7 @@ document.querySelectorAll("[data-move]").forEach(b=>{
  b.addEventListener("pointerdown",e=>{e.preventDefault();keys[k]=true;});
  ["pointerup","pointerleave","pointercancel"].forEach(n=>b.addEventListener(n,()=>keys[k]=false));
 });
-function miniDraw(){
- if(!mc||!mini)return;const r=mini.getBoundingClientRect();if(!r.width)return;
- mc.clearRect(0,0,r.width,r.height);mc.fillStyle="#b9cf91";mc.fillRect(0,0,r.width,r.height);
- mc.fillStyle="#55a9c8";mc.fillRect(0,r.height*.43,r.width,r.height*.14);
- mc.strokeStyle="#858b83";mc.lineWidth=4;
- for(let n=0;n<6;n++){mc.beginPath();mc.moveTo(n*r.width/5,0);mc.lineTo(n*r.width/5,r.height);mc.moveTo(0,n*r.height/5);mc.lineTo(r.width,n*r.height/5);mc.stroke();}
- places.forEach(p=>{mc.fillStyle=p.type==="park"?"#39885c":"#e4d6bd";mc.fillRect((p.x+130)/260*r.width-2,(p.z+95)/190*r.height-2,5,5);});
- mc.fillStyle="#fff";mc.beginPath();mc.arc((player.x+130)/260*r.width,(player.z+95)/190*r.height,4,0,7);mc.fill();
-}
+
 function frame(t){
  requestAnimationFrame(frame);const dt=Math.min(.04,(t-last)/1000);last=t;
  let dx=0,dz=0;if(keys.KeyW||keys.ArrowUp)dz-=1;if(keys.KeyS||keys.ArrowDown)dz+=1;
@@ -222,7 +221,7 @@ function frame(t){
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
  if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN");
- miniDraw();
+
 }
 requestAnimationFrame(frame);
 })();
