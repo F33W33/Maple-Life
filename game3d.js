@@ -227,7 +227,7 @@ canvas.addEventListener("pointermove",e=>{
   const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;
   if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;
   const scale=104/Math.max(1,rect.height)/Math.max(.65,camera.zoom);
-  viewOffsetX-=dx*scale;viewOffsetZ+=dy*scale;
+  viewOffsetX+=dx*scale;viewOffsetZ-=dy*scale;
   lastPointerX=e.clientX;lastPointerY=e.clientY;
   hoveredPlace=null;canvas.style.cursor="grabbing";
  }else{
