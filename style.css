@@ -448,3 +448,14 @@ body.auth-complete #characterScreen{display:none!important;visibility:hidden!imp
   #welcomeModal .avatar-choices{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px!important}
   #welcomeModal .welcome-modal{padding:25px 20px}
 }
+
+/* Keep only the temporary cursor-look tip; remove the keyboard instruction panel. */
+.game-controls-hint{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;padding:5px 8px!important;
+ color:#fff!important;text-shadow:0 2px 5px #18364dcc;
+ font-size:10px!important;letter-spacing:1.4px;
+ transition:opacity .35s ease,visibility .35s ease;
+ pointer-events:none;
+}
+.game-controls-hint.is-hidden{opacity:0!important;visibility:hidden!important}
