@@ -251,13 +251,21 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
  #mapleGame .game-minimap{left:8px;bottom:8px}
 }
 
-/* Maple Life: no minimap and collapsed navigation on first entry */
+/* Maple Life: hide minimap and keep the sidebar collapsed until the player opens it */
 #mapleGame .game-minimap{display:none!important}
-#mapleGame .life-sidebar{width:62px;padding:13px 8px}
-#mapleGame .life-sidebar-brand b,#mapleGame .life-sidebar-label,#mapleGame .life-menu-item b,#mapleGame .life-sidebar-hotbar{display:none}
-#mapleGame .life-sidebar-brand{justify-content:center;padding:0 0 8px}
-#mapleGame .life-menu-item{justify-content:center;padding:8px 0}
-#mapleGame .life-menu-item span{font-size:22px}
-#mapleGame .life-sidebar-toggle{right:-13px}
-#mapleGame .game-objectives{left:92px}
-@media(max-width:760px){#mapleGame .life-sidebar{width:51px;padding:9px 6px}#mapleGame .game-objectives{left:67px}}
+#mapleGame .game-objectives{display:none!important}
+#mapleGame .life-sidebar{width:202px;padding:15px 12px 13px;pointer-events:auto}
+#mapleGame .life-sidebar.collapsed{width:62px;padding:13px 8px}
+#mapleGame .life-sidebar.collapsed .life-sidebar-brand b,
+#mapleGame .life-sidebar.collapsed .life-sidebar-label,
+#mapleGame .life-sidebar.collapsed .life-menu-item b,
+#mapleGame .life-sidebar.collapsed .life-sidebar-hotbar{display:none}
+#mapleGame .life-sidebar.collapsed .life-sidebar-brand{justify-content:center;padding:0 0 8px}
+#mapleGame .life-sidebar.collapsed .life-menu-item{justify-content:center;padding:8px 0}
+#mapleGame .life-sidebar.collapsed .life-menu-item span{font-size:22px}
+#mapleGame .life-sidebar-toggle{z-index:2;pointer-events:auto;touch-action:manipulation}
+#mapleGame .life-sidebar.collapsed .life-sidebar-toggle{right:-13px}
+@media(max-width:760px){
+  #mapleGame .life-sidebar{width:178px;padding:10px 8px}
+  #mapleGame .life-sidebar.collapsed{width:51px;padding:9px 6px}
+}
