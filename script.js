@@ -324,9 +324,36 @@
 
   function gameToast(message){const el=$("#gameToast");if(!el)return;el.textContent=message;el.classList.add("show");clearTimeout(gameToast.timer);gameToast.timer=setTimeout(()=>el.classList.remove("show"),2400);}
   function renderGameHud(){const put=(id,v)=>{const e=$("#"+id);if(e)e.textContent=v;};put("gameCash",money(state.cash));put("gameProvince",state.province||"Saskatchewan");put("gameDate","MAPLEWOOD · DAY "+state.day);[["Happy","happiness"],["Hunger","hunger"],["Energy","energy"]].forEach(([n,k])=>{put("game"+n+"Value",Math.round(state[k])+"%");const b=$("#game"+n+"Bar");if(b)b.style.width=clamp(state[k])+"%";});}
-  function openGamePanel(type){const panel=$("#gamePanel"),content=$("#gamePanelContent");if(!panel||!content)return;const btn=(label,action)=>'<button class="panel-choice" data-panel-action="'+action+'">'+label+'</button>';let body="";if(type==="phone")body="<h2>📱 My phone</h2><p>Your Maple Life pocket helper.</p>"+btn("💼 Careers & jobs","jobs")+btn("🛍️ Marketplace","shop")+btn("🏠 My home","home-life")+btn("💳 Wallet & bank","wallet");else if(type==="inventory")body="<h2>🎒 Inventory</h2><p>"+(state.inventory.length?state.inventory.map(x=>x.icon+" "+x.name).join("<br>"):"Your backpack is empty. Visit the marketplace to pick up supplies.")+"</p>"+btn("Visit marketplace","shop");else if(type==="profile")body="<h2>🙂 "+(state.name||"Your character")+"</h2><p>"+(state.province||"Saskatchewan")+" · "+(state.job?state.job.title:"Unemployed")+"</p>"+btn("Edit character","profile-edit");else body="<h2>🍁 Maple Life menu</h2><p>Where would you like to go?</p>"+btn("💼 Careers & jobs","jobs")+btn("🏠 My home","home-life")+btn("🛍️ Marketplace","shop")+btn("💳 Wallet & bank","wallet")+btn("📱 Character profile","profile");content.innerHTML=body;panel.classList.add("open");}
-  document.addEventListener("click",e=>{const t=e.target.closest("[data-game-panel]");if(t){openGamePanel(t.dataset.gamePanel);return;}const hot=e.target.closest("[data-hotbar]");if(hot){const a=hot.dataset.hotbar;if(a==="eat")activity("eat");else if(a==="coffee")activity("coffee");else if(a==="rest")activity("rest");else openGamePanel(a);return;}const a=e.target.closest("[data-panel-action]");if(a){const v=a.dataset.panelAction;$("#gamePanel").classList.remove("open");if(v==="profile-edit"){openProfileEditor();return;}navigate(v);}});
+  function openGamePanel(type){
+    const panel=$("#gamePanel"),content=$("#gamePanelContent");if(!panel||!content)return;
+    const button=(label,screen)=>'<button class="phone-app-card" data-phone-screen="'+screen+'">'+label+' <span>›</span></button>';
+    const go=(label,view)=>'<button class="phone-action" data-phone-go="'+view+'">'+label+' <span>→</span></button>';
+    let title="Maple Life",subtitle="YOUR POCKET COMPANION",body="";
+    if(type==="inventory"){
+      title="🎒 Inventory";subtitle="YOUR BELONGINGS";
+      body=state.inventory.length?'<div class="phone-item-list">'+state.inventory.map(item=>'<div class="phone-item"><span>'+item.icon+'</span><b>'+item.name+'</b><small>In your bag</small></div>').join("")+'</div>':'<div class="phone-empty"><span>🎒</span><b>Your backpack is empty</b><small>Visit the marketplace to pick up a few essentials.</small></div>'+go("Browse marketplace","shop");
+    }else if(type==="profile"){
+      title="⚙️ Settings & profile";subtitle="YOUR ACCOUNT";
+      body='<div class="phone-profile"><span>'+(state.avatar||"🙂")+'</span><b>'+(state.name||"New Resident")+'</b><small>'+(state.province||"Saskatchewan")+'</small></div>'+go("Edit character","profile-edit")+'<p class="phone-note">Settings and character options will live here.</p>';
+    }else if(type==="map"){
+      title="📍 City map";subtitle="EXPLORE MAPLEWOOD";
+      body='<div class="phone-feature"><span>🏙️</span><b>Maplewood, Saskatchewan</b><small>Explore neighbourhoods, parks, shops and community places.</small></div>'+go("Open city view","city");
+    }else if(type==="shop"){
+      title="🛍️ Marketplace";subtitle="LOCAL FINDS";
+      body='<div class="phone-balance">YOUR CASH <b>'+money(state.cash)+'</b></div>'+go("Browse all items","shop");
+    }else if(type==="quests"){
+      title="🏆 Quests";subtitle="YOUR NEXT STEPS";
+      body='<div class="phone-quest"><span>'+(state.job?"✓":"1")+'</span><div><b>Find a job</b><small>'+(state.job?"You have a job!":"Start earning your own money")+'</small></div></div><div class="phone-quest"><span>'+(state.visited.includes("square")?"✓":"2")+'</span><div><b>Explore downtown</b><small>'+(state.visited.includes("square")?"City Square visited":"Visit City Square")+'</small></div></div><div class="phone-quest"><span>'+(state.home!=="starter"?"✓":"3")+'</span><div><b>Settle into your home</b><small>'+(state.home!=="starter"?"You found a new home":"Make your place feel like yours")+'</small></div></div>'+go("View your progress","home");
+    }else{
+      title=type==="phone"?"📱 My phone":"🏠 Home";subtitle="MAPLE LIFE APPS";
+      body='<div class="phone-profile compact"><span>'+(state.avatar||"🙂")+'</span><div><b>'+(state.name||"New Resident")+'</b><small>Maplewood resident</small></div><strong>'+money(state.cash)+'</strong></div><div class="phone-app-grid">'+button("🎒<b>Inventory</b>","inventory")+button("📍<b>City map</b>","map")+button("🛍️<b>Marketplace</b>","shop")+button("🏆<b>Quests</b>","quests")+button("💼<b>Careers</b>","jobs")+button("🏡<b>My home</b>","home-life")+'</div>';
+    }
+    content.innerHTML='<div class="phone-shell"><div class="phone-speaker"></div><div class="phone-status"><span>🍁 MAPLE LIFE</span><span>● ● ●</span></div><div class="phone-heading"><div><small>'+subtitle+'</small><h2>'+title+'</h2></div><button class="phone-close" id="phoneClose" aria-label="Close phone">×</button></div><div class="phone-screen-content">'+body+'</div><div class="phone-nav"><span>⌂<small>HOME</small></span><span>▦<small>APPS</small></span><span>●<small>YOU</small></span></div></div>';
+    panel.classList.add("open");
+  }
+    document.addEventListener("click",e=>{const phoneScreen=e.target.closest("[data-phone-screen]");if(phoneScreen){openGamePanel(phoneScreen.dataset.phoneScreen);return;}const phoneGo=e.target.closest("[data-phone-go]");if(phoneGo){const target=phoneGo.dataset.phoneGo;$("#gamePanel").classList.remove("open");if(target==="profile-edit"){openProfileEditor();return;}navigate(target);return;}const t=e.target.closest("[data-game-panel]");if(t){openGamePanel(t.dataset.gamePanel);return;}const hot=e.target.closest("[data-hotbar]");if(hot){const a=hot.dataset.hotbar;if(a==="eat")activity("eat");else if(a==="coffee")activity("coffee");else if(a==="rest")activity("rest");else openGamePanel(a);return;}const a=e.target.closest("[data-panel-action]");if(a){const v=a.dataset.panelAction;$("#gamePanel").classList.remove("open");if(v==="profile-edit"){openProfileEditor();return;}navigate(v);}});
   $("#gamePanelClose")?.addEventListener("click",()=>$("#gamePanel").classList.remove("open"));
+  document.addEventListener("click",e=>{if(e.target.closest("#phoneClose"))$("#gamePanel").classList.remove("open");});
   document.querySelectorAll("[data-enter-game]").forEach(button => {
     button.addEventListener("click", () => {
       if (!state.name) state.name = "New Resident";
