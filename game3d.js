@@ -8,7 +8,7 @@ host.innerHTML="";
 
 const T=THREE,scene=new T.Scene();
 scene.background=new T.Color(0xc4d7a2);
-const camera=new T.OrthographicCamera(-70,70,48,-48,.1,400);
+const camera=new T.OrthographicCamera(-70,70,48,-48,.1,3000);
 const renderer=new T.WebGLRenderer({antialias:true,powerPreference:"low-power"});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));
 renderer.shadowMap.enabled=false;
