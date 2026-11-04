@@ -167,6 +167,44 @@ cube(avatar,0,1.95,0,.78,.75,.7,mat(0xc9906d));
 cube(avatar,0,2.35,0,.8,.2,.72,mat(0x302b29));
 cube(avatar,-.27,.3,0,.34,.65,.42,mat(0x35415d));cube(avatar,.27,.3,0,.34,.65,.42,mat(0x35415d));
 const locationById=Object.fromEntries(places.map(p=>[p.id,p]));
+const placeLabels=[],placeHitAreas=[];
+for(const p of places){
+ const labelSprite=scene.children.find(o=>o.isSprite && o.position.x===p.x && o.position.z===p.z-9);
+ if(labelSprite){labelSprite.material.opacity=0;labelSprite.material.transparent=true;labelSprite.scale.set(0,0,1);placeLabels.push({place:p,sprite:labelSprite,active:false});}
+ const hit=new T.Mesh(new T.PlaneGeometry(22,20),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));
+ hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;scene.add(hit);placeHitAreas.push(hit);
+}
+const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
+let hoveredPlace=null,dragging=false,dragMoved=false,lastPointerX=0,lastPointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
+const canvas=renderer.domElement;
+canvas.style.cursor="grab";
+canvas.addEventListener("pointerdown",e=>{
+ if(e.button!==0)return;
+ dragging=true;dragMoved=false;lastPointerX=e.clientX;lastPointerY=e.clientY;
+ canvas.setPointerCapture(e.pointerId);canvas.style.cursor="grabbing";
+});
+canvas.addEventListener("pointermove",e=>{
+ const rect=canvas.getBoundingClientRect();
+ pointerNdc.set(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+ if(dragging){
+  const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;
+  if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;
+  const scale=104/Math.max(1,rect.height)/Math.max(.65,camera.zoom);
+  viewOffsetX-=dx*scale;viewOffsetZ+=dy*scale;
+  lastPointerX=e.clientX;lastPointerY=e.clientY;
+  hoveredPlace=null;canvas.style.cursor="grabbing";
+ }else{
+  hoverRaycaster.setFromCamera(pointerNdc,camera);
+  const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
+  hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
+  canvas.style.cursor=hoveredPlace?"pointer":"grab";
+ }
+});
+function stopDrag(e){if(!dragging)return;dragging=false;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);canvas.style.cursor=hoveredPlace?"pointer":"grab";}
+canvas.addEventListener("pointerup",stopDrag);
+canvas.addEventListener("pointercancel",stopDrag);
+canvas.addEventListener("pointerleave",e=>{if(!dragging)hoveredPlace=null;});
+
 function resize(){
  const r=host.getBoundingClientRect();if(!r.width||!r.height)return;
  renderer.setSize(r.width,r.height,false);
@@ -215,7 +253,20 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- camera.position.set(player.x,100,player.z+38);camera.lookAt(player.x,0,player.z);
+ const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
+ camera.position.set(targetX+Math.sin(cameraAngle)*38,100,targetZ+Math.cos(cameraAngle)*38);
+ camera.lookAt(targetX,0,targetZ);
+ for(const item of placeLabels){
+  const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
+  if(active!==item.active)item.active=active;
+  const target=active?1:0;
+  const current=item.sprite.material.opacity;
+  item.sprite.material.opacity+= (target-current)*Math.min(1,dt*12);
+  const scale=17*item.sprite.material.opacity;
+  item.sprite.scale.set(scale,4.25*item.sprite.material.opacity,1);
+  if(active){item.sprite.position.y=7.2+Math.sin(t*.006)*.42;}
+  else item.sprite.position.y=7;
+ }
  renderer.render(scene,camera);
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
