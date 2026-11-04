@@ -270,35 +270,23 @@ for(const p of places){
  hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;scene.add(hit);placeHitAreas.push(hit);
 }
 const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
-let hoveredPlace=null,dragging=false,dragMoved=false,lastPointerX=0,lastPointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
+let hoveredPlace=null,pointerX=0,pointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
 const canvas=renderer.domElement;
-canvas.style.cursor="grab";
-canvas.addEventListener("pointerdown",e=>{
- if(e.button!==0)return;
- dragging=true;dragMoved=false;lastPointerX=e.clientX;lastPointerY=e.clientY;
- canvas.setPointerCapture(e.pointerId);canvas.style.cursor="grabbing";
-});
+canvas.style.cursor="crosshair";
 canvas.addEventListener("pointermove",e=>{
  const rect=canvas.getBoundingClientRect();
- pointerNdc.set(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
- if(dragging){
-  const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;
-  if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;
-  const scale=260/Math.max(1,rect.height)/Math.max(.65,camera.zoom);
-  viewOffsetX+=dx*scale;viewOffsetZ-=dy*scale;
-  lastPointerX=e.clientX;lastPointerY=e.clientY;
-  hoveredPlace=null;canvas.style.cursor="grabbing";
- }else{
-  hoverRaycaster.setFromCamera(pointerNdc,camera);
-  const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
-  hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
-  canvas.style.cursor=hoveredPlace?"pointer":"grab";
- }
+ if(!rect.width||!rect.height)return;
+ pointerX=T.MathUtils.clamp(((e.clientX-rect.left)/rect.width-.5)*2,-1,1);
+ pointerY=T.MathUtils.clamp(((e.clientY-rect.top)/rect.height-.5)*2,-1,1);
+ pointerNdc.set(pointerX,-pointerY);
+ hoverRaycaster.setFromCamera(pointerNdc,camera);
+ const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
+ hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
+ canvas.style.cursor=hoveredPlace?"pointer":"crosshair";
 });
-function stopDrag(e){if(!dragging)return;dragging=false;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);canvas.style.cursor=hoveredPlace?"pointer":"grab";}
-canvas.addEventListener("pointerup",stopDrag);
-canvas.addEventListener("pointercancel",stopDrag);
-canvas.addEventListener("pointerleave",e=>{if(!dragging)hoveredPlace=null;});
+canvas.addEventListener("pointerleave",()=>{
+ pointerX=0;pointerY=0;hoveredPlace=null;canvas.style.cursor="crosshair";
+});
 
 function resize(){
  const r=host.getBoundingClientRect();if(!r.width||!r.height)return;
@@ -348,7 +336,7 @@ function frame(t){
  }
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
- const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
+ const lookAheadX=pointerX*125,lookAheadZ=pointerY*90;\n viewOffsetX+=(lookAheadX-viewOffsetX)*Math.min(1,dt*3.2);\n viewOffsetZ+=(lookAheadZ-viewOffsetZ)*Math.min(1,dt*3.2);\n const targetX=player.x+viewOffsetX,targetZ=player.z+viewOffsetZ;
  camera.position.set(targetX+Math.sin(cameraAngle)*380,1000,targetZ+Math.cos(cameraAngle)*380);
  camera.lookAt(targetX,0,targetZ);
  for(const item of placeLabels){
