@@ -346,3 +346,12 @@ body:has(#mapleGame:target) #authScreen{display:none!important}
 #mapleGame .phone-nav span{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:16px}
 #mapleGame .phone-nav small{font-size:7px;font-weight:900;letter-spacing:1px}
 @media(max-width:600px){#mapleGame .game-panel{width:min(350px,calc(100% - 20px))}#mapleGame .phone-shell{min-height:470px;border-width:6px;border-radius:30px;padding:20px 15px 13px}}
+
+/* Single floating phone launcher */
+#mapleGame .life-sidebar.phone-launcher{position:absolute;z-index:31;left:18px;top:50%;transform:translateY(-50%);width:62px;height:62px;max-height:none;display:grid;place-items:center;padding:0;overflow:visible;background:transparent;border:0;border-radius:20px;box-shadow:none;backdrop-filter:none}
+#mapleGame .phone-launcher-button{width:62px;height:62px;display:grid;place-items:center;padding:0;border:1px solid #ffffffaa;border-radius:20px;background:rgba(248,252,243,.94);box-shadow:0 8px 28px #14291e44;color:#294331;font-size:29px;transition:transform .2s,box-shadow .2s}
+#mapleGame .phone-launcher-button:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 12px 32px #14291e55}
+#mapleGame .phone-launcher-button:focus-visible{outline:3px solid #d9b967;outline-offset:3px}
+@media(max-width:600px){#mapleGame .life-sidebar.phone-launcher{left:10px;top:82px;transform:none;width:50px;height:50px}#mapleGame .phone-launcher-button{width:50px;height:50px;border-radius:15px;font-size:24px}}
+/* Perspective city lighting and hover labels */
+#mapleGame #maple3d canvas{display:block;width:100%;height:100%}
