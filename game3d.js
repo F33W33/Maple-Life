@@ -350,11 +350,30 @@ for(const p of places){
 }
 const hoverRaycaster=new T.Raycaster(),pointerNdc=new T.Vector2();
 let hoveredPlace=null,pointerX=0,pointerY=0,viewOffsetX=0,viewOffsetZ=0,cameraAngle=0;
+let orbitYaw=0,orbitPitch=Math.atan2(.8,.6),orbitDistance=900,orbitBaseDistance=900,dragging=false,lastPointerX=0,lastPointerY=0;
 const canvas=renderer.domElement;
+canvas.style.touchAction="none";
+canvas.style.cursor="grab";
+function updateOrbitCamera(){
+ const radius=orbitBaseDistance/camera.zoom;
+ const horizontal=Math.cos(orbitPitch)*radius;
+ camera.position.set(Math.sin(orbitYaw)*horizontal,Math.sin(orbitPitch)*radius,Math.cos(orbitYaw)*horizontal);
+ camera.lookAt(0,0,0);
+}
 canvas.style.cursor="crosshair";
 // Track the pointer at window level so looking continues when it reaches the edge
 // of the 3D canvas. Clamp to the canvas bounds instead of resetting on pointerleave.
+canvas.addEventListener("pointerdown",e=>{
+ if(e.button!==0&&e.pointerType!=="touch")return;
+ dragging=true;lastPointerX=e.clientX;lastPointerY=e.clientY;canvas.setPointerCapture?.(e.pointerId);canvas.style.cursor="grabbing";
+});
+window.addEventListener("pointerup",()=>{dragging=false;canvas.style.cursor=hoveredPlace?"pointer":"grab";});
+window.addEventListener("pointercancel",()=>{dragging=false;canvas.style.cursor="grab";});
 window.addEventListener("pointermove",e=>{
+ if(dragging){
+  const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;lastPointerX=e.clientX;lastPointerY=e.clientY;
+  orbitYaw-=dx*.006;orbitPitch=T.MathUtils.clamp(orbitPitch+dy*.006,-1.48,1.48);updateOrbitCamera();
+ }
  const rect=canvas.getBoundingClientRect();
  if(!rect.width||!rect.height)return;
  pointerX=T.MathUtils.clamp(((e.clientX-rect.left)/rect.width-.5)*2,-1,1);
@@ -366,7 +385,7 @@ window.addEventListener("pointermove",e=>{
   hoverRaycaster.setFromCamera(pointerNdc,camera);
   const hit=hoverRaycaster.intersectObjects(placeHitAreas,false)[0];
   hoveredPlace=hit?places.find(p=>p.id===hit.object.userData.placeId)||null:null;
-  canvas.style.cursor=hoveredPlace?"pointer":"crosshair";
+  if(!dragging)canvas.style.cursor=hoveredPlace?"pointer":"grab";
  }else{
   hoveredPlace=null;
  }
@@ -382,8 +401,8 @@ function resize(){
  camera.aspect=aspect;
  const projectedMapHeight=Math.max(WORLD_D*.8,WORLD_W*.8/aspect)*1.2;
  const distance=projectedMapHeight/(2*Math.tan(T.MathUtils.degToRad(camera.fov/2)));
- camera.position.set(0,distance*.8,distance*.6);
- camera.lookAt(0,0,0);
+ orbitBaseDistance=distance;
+ updateOrbitCamera();
  camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(host);resize();
@@ -428,8 +447,7 @@ function frame(t){
  avatar.position.set(player.x,0,player.z);avatar.rotation.y=player.yaw;
  avatar.position.y=Math.abs(Math.sin(walk*1.6))*.06;
 
- // Fixed city overview: the whole map stays framed without cursor movement.
- camera.lookAt(0,0,0);
+ // Orbit camera stays focused on the centre of the town while the player moves.
  for(const item of placeLabels){
   const active=!!hoveredPlace&&hoveredPlace.id===item.place.id;
   if(active!==item.active)item.active=active;
