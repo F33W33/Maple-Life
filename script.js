@@ -188,6 +188,7 @@
     state.day += 1;
     state.rentPaid = false;
     render();
+    if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
     toast("Shift complete! You earned " + money(earned) + " for " + hours + " hours of work.");
   }
   function buyProduct(id) {
@@ -266,6 +267,7 @@
       if (!job || state.job) { toast(state.job ? "You already have a job. Work a shift at your current workplace." : "That job is unavailable."); return; }
       state.job = job;
       render();
+      if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
       toast("You're hired! Welcome aboard as a " + job.title + ".");
       return;
     }
@@ -329,7 +331,20 @@
     const button=(label,screen)=>'<button class="phone-app-card" data-phone-screen="'+screen+'">'+label+' <span>›</span></button>';
     const go=(label,view)=>'<button class="phone-action" data-phone-go="'+view+'">'+label+' <span>→</span></button>';
     let title="Maple Life",subtitle="YOUR POCKET COMPANION",body="";
-    if(type==="inventory"){
+    if(type==="jobs"){
+      title="💼 Careers";subtitle="FIND WORK IN MAPLEWOOD";
+      const icons={retail:"🛍️",cafe:"☕",delivery:"🚲",office:"💻"};
+      const descriptions={retail:"Help customers and keep the shelves organized.",cafe:"Prepare orders and welcome café guests.",delivery:"Deliver local orders around Maplewood.",office:"Support a team with everyday office tasks."};
+      const current=state.job;
+      body='<div class="career-phone-balance"><span>AVAILABLE BALANCE</span><b>'+money(state.cash)+'</b></div>';
+      if(current){
+        const currentKey=Object.keys(jobs).find(key=>jobs[key].title===current.title);
+        body+='<div class="career-current"><small>YOUR CURRENT POSITION</small><div><span>'+((icons[currentKey])||"💼")+'</span><section><b>'+current.title+'</b><small>'+current.place+' · '+money(current.wage)+'/hr</small></section></div><button class="career-work-button" data-job="'+currentKey+'">Work a 4-hour shift · '+money(current.wage*4)+'</button><p>Each shift earns pay and uses some energy.</p></div>';
+      }else{
+        body+='<div class="career-welcome"><span>🌱</span><b>Your next chapter starts here.</b><small>Choose an open position below to get hired and start earning.</small></div>';
+      }
+      body+='<div class="career-section-label">OPEN POSITIONS <span>4 JOBS</span></div><div class="career-phone-list">'+Object.entries(jobs).map(([key,job])=>'<article class="career-phone-card"><div class="career-phone-icon">'+icons[key]+'</div><div class="career-phone-info"><b>'+job.title+'</b><small>'+job.place+'</small><p>'+descriptions[key]+'</p><strong>'+money(job.wage)+' <small>/ hour</small></strong></div><button class="career-apply-button" data-job="'+key+'" '+(current?'disabled':'')+'>'+(current?(current.title===job.title?'Current job':'Already employed'):'Apply')+'</button></article>').join("")+'</div>';
+    }else if(type==="inventory"){
       title="🎒 Inventory";subtitle="YOUR BELONGINGS";
       body=state.inventory.length?'<div class="phone-item-list">'+state.inventory.map(item=>'<div class="phone-item"><span>'+item.icon+'</span><b>'+item.name+'</b><small>In your bag</small></div>').join("")+'</div>':'<div class="phone-empty"><span>🎒</span><b>Your backpack is empty</b><small>Visit the marketplace to pick up a few essentials.</small></div>'+go("Browse marketplace","shop");
     }else if(type==="profile"){
