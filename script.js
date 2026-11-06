@@ -394,6 +394,12 @@
         body+='<div class="career-welcome"><span>🌱</span><b>Your next chapter starts here.</b><small>Choose an open position below to get hired and start earning.</small></div>';
       }
       body+='<div class="career-section-label">OPEN POSITIONS <span>4 JOBS</span></div><div class="career-phone-list">'+Object.entries(jobs).map(([key,job])=>{const app=applicationFor(key);const label=current?'Already employed':app?(app.status==='pending'?'Pending':app.status==='offer'?'Offer received':app.status==='accepted'?'Hired':'Apply again'):'Apply';return '<article class="career-phone-card"><div class="career-phone-icon">'+icons[key]+'</div><div class="career-phone-info"><b>'+job.title+'</b><small>'+job.place+'</small><p>'+descriptions[key]+'</p><strong>'+money(job.wage)+' <small>/ hour</small></strong></div><button class="career-apply-button" data-apply="'+key+'" '+(current||app&&app.status!=="rejected"?'disabled':'')+'>'+label+'</button></article>';}).join("")+'</div>';
+    }else if(type==="home-life"){
+      title="🏡 My home";subtitle="HOMES IN MAPLEWOOD";
+      body='<div class="career-phone-balance"><span>AVAILABLE BALANCE</span><b>'+money(state.cash)+'</b></div>';
+      const currentHome=homes[state.home]||homes.starter;
+      body+='<div class="home-phone-current"><small>YOUR CURRENT HOME</small><b>🏠 '+currentHome.title+'</b><span>'+money(currentHome.rent)+' / month</span></div>';
+      body+='<div class="career-section-label">AVAILABLE LISTINGS <span>'+Object.keys(homes).length+' HOMES</span></div><div class="career-phone-list">'+Object.entries(homes).map(([key,home])=>'<article class="home-phone-card"><div class="home-phone-art">'+(home.type==="Apartment"?"🏢":home.type==="Condo"?"🏙️":"🏡")+'</div><div class="career-phone-info"><b>'+home.title+'</b><small>'+home.type+' · '+money(home.rent)+'/month</small><p>'+home.description+'</p></div><button class="career-apply-button" data-home="'+key+'" '+(state.home===key?'disabled':'')+'>'+(state.home===key?'Your home':'Move in')+'</button></article>').join("")+'</div>';
     }else if(type==="inventory"){
       title="🎒 Inventory";subtitle="YOUR BELONGINGS";
       body=state.inventory.length?'<div class="phone-item-list">'+state.inventory.map(item=>'<div class="phone-item"><span>'+item.icon+'</span><b>'+item.name+'</b><small>In your bag</small></div>').join("")+'</div>':'<div class="phone-empty"><span>🎒</span><b>Your backpack is empty</b><small>Visit the marketplace to pick up a few essentials.</small></div>'+go("Browse marketplace","shop");
