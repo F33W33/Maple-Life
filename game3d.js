@@ -292,7 +292,7 @@ cube(avatar,-.27,.3,0,.34,.65,.42,mat(0x35415d));cube(avatar,.27,.3,0,.34,.65,.4
 const locationById=Object.fromEntries(places.map(p=>[p.id,p]));
 const placeLabels=[],placeHitAreas=[];
 for(const p of places){
- const labelSprite=world.children.find(o=>o.isSprite && o.position.x===p.x && o.position.z===p.z-24);
+ const labelSprite=world.children.find(o=>o.isSprite && o.position.x===p.x && o.position.z===p.z-22);
  if(labelSprite){labelSprite.material.opacity=0;labelSprite.material.transparent=true;labelSprite.scale.set(0,0,1);placeLabels.push({place:p,sprite:labelSprite,active:false});}
  const hit=new T.Mesh(new T.PlaneGeometry(48,42),new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:T.DoubleSide}));
  hit.rotation.x=-Math.PI/2;hit.position.set(p.x,.18,p.z);hit.userData.placeId=p.id;world.add(hit);placeHitAreas.push(hit);
