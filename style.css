@@ -459,3 +459,34 @@ body.auth-complete #characterScreen{display:none!important;visibility:hidden!imp
  pointer-events:none;
 }
 .game-controls-hint.is-hidden{opacity:0!important;visibility:hidden!important}
+
+
+/* Career app inside the floating phone */
+#mapleGame .career-phone-balance{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-radius:13px;background:#fff;color:#82917d;font-size:9px;font-weight:900;letter-spacing:.7px}
+#mapleGame .career-phone-balance b{color:#36513a;font-size:17px;letter-spacing:0}
+#mapleGame .career-welcome{display:flex;flex-direction:column;align-items:center;gap:7px;margin:11px 0;padding:19px 14px;border-radius:16px;background:#eaf2e5;text-align:center;color:#36513a}
+#mapleGame .career-welcome>span{font-size:30px}
+#mapleGame .career-welcome>b{font-size:13px}
+#mapleGame .career-welcome>small{max-width:245px;color:#7b8d77;font-size:10px;line-height:1.5}
+#mapleGame .career-current{margin:11px 0;padding:14px;border:1px solid #dce8d7;border-radius:16px;background:#fff}
+#mapleGame .career-current>small,.career-section-label{font-size:8px;font-weight:900;letter-spacing:1.1px;color:#84947e}
+#mapleGame .career-current>div{display:flex;align-items:center;gap:10px;margin:10px 0}
+#mapleGame .career-current>div>span{font-size:30px}
+#mapleGame .career-current section{display:flex;flex-direction:column;gap:4px}
+#mapleGame .career-current section b{font-size:12px;color:#36513a}
+#mapleGame .career-current section small{font-size:10px;color:#84947e}
+#mapleGame .career-work-button{width:100%;padding:11px;border:0;border-radius:11px;background:#31583a;color:#fff;font-size:11px;font-weight:900;cursor:pointer}
+#mapleGame .career-current>p{margin:8px 0 0;text-align:center;color:#879583;font-size:9px}
+#mapleGame .career-section-label{display:flex;justify-content:space-between;margin:18px 2px 9px}
+#mapleGame .career-section-label span{color:#a0ad99}
+#mapleGame .career-phone-list{display:grid;gap:9px}
+#mapleGame .career-phone-card{display:grid;grid-template-columns:38px minmax(0,1fr);gap:9px;padding:11px;border:1px solid #e0e9d9;border-radius:14px;background:#fff}
+#mapleGame .career-phone-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#eff5e9;font-size:20px}
+#mapleGame .career-phone-info{min-width:0}
+#mapleGame .career-phone-info>b{display:block;color:#36513a;font-size:11px}
+#mapleGame .career-phone-info>small{display:block;margin-top:3px;color:#899786;font-size:9px}
+#mapleGame .career-phone-info p{margin:7px 0;color:#71816f;font-size:9px;line-height:1.4}
+#mapleGame .career-phone-info>strong{color:#3c6842;font-size:12px}
+#mapleGame .career-phone-info>strong small{font-size:9px;font-weight:500;color:#84947e}
+#mapleGame .career-apply-button{grid-column:2;justify-self:start;min-width:82px;margin-top:2px;padding:7px 11px;border:0;border-radius:9px;background:#e7f0e1;color:#365a3b;font-size:9px;font-weight:900;cursor:pointer}
+#mapleGame .career-apply-button:disabled{background:#f0f2ed;color:#9aa497;cursor:default}
