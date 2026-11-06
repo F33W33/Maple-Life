@@ -283,6 +283,7 @@
     state.home = id;
     state.rentPaid = true;
     render();
+    if ($("#gamePanel")?.classList.contains("open")) openGamePanel("home-life");
     toast("Welcome to your new home! First month's rent paid.");
   }
   function payRent() {
