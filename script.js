@@ -4,7 +4,7 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const SAVE_KEY = "mapleLifeSaveV1";
   const initialState = {
-    name: "", avatar: "🧑🏽", province: "Saskatchewan", cash: 1000, job: null, home: "starter",
+    name: "", avatar: "🧑🏽", province: "Saskatchewan", cash: 0, cashResetForZeroStart: true, job: null, home: "starter",
     day: 1, hunger: 82, energy: 90, happiness: 76, inventory: [], applications: [],
     visited: [], rentPaid: false, tasks: []
   };
@@ -44,7 +44,16 @@
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-      return saved && typeof saved === "object" ? { ...initialState, ...saved } : { ...initialState };
+      if (saved && typeof saved === "object") {
+        // Existing saves get a one-time reset so every resident begins with $0.
+        if (saved.cashResetForZeroStart !== true) {
+          saved.cash = 0;
+          saved.cashResetForZeroStart = true;
+          localStorage.setItem(SAVE_KEY, JSON.stringify({ ...initialState, ...saved }));
+        }
+        return { ...initialState, ...saved };
+      }
+      return { ...initialState };
     } catch { return { ...initialState }; }
   }
   function saveState() {
