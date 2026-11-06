@@ -162,46 +162,46 @@ function label(text,x,z,emoji=""){
 }
 // Ten recognizable downtown landmarks, positioned around a walkable street grid.
 const places=[
- {id:"bessborough",name:"Delta Bessborough",short:"Bessborough",x:88,z:112,emoji:"🏰",type:"hotel"},
- {id:"midtown",name:"Midtown Plaza",short:"Midtown Plaza",x:-22,z:-16,emoji:"🛍",type:"shopping"},
- {id:"nutrien",name:"Nutrien Tower",short:"Nutrien Tower",x:20,z:12,emoji:"🏙️",type:"tower"},
- {id:"tcu",name:"TCU Place",short:"TCU Place",x:-66,z:-88,emoji:"🎭",type:"venue"},
- {id:"cityhall",name:"Saskatoon City Hall",short:"City Hall",x:-70,z:93,emoji:"🏛️",type:"civic"},
- {id:"library",name:"Frances Morrison Library",short:"Public Library",x:-119,z:93,emoji:"📚",type:"library"},
- {id:"drinkle",name:"Drinkle Building",short:"Drinkle Building",x:-85,z:-18,emoji:"🏢",type:"heritage"},
- {id:"senator",name:"Hotel Senator",short:"Hotel Senator",x:-96,z:-62,emoji:"🏨",type:"heritage"},
- {id:"alt",name:"Alt Hotel Saskatoon",short:"Alt Hotel",x:57,z:-82,emoji:"🏨",type:"hotel"},
- {id:"remai",name:"Remai Modern",short:"Remai Modern",x:91,z:-111,emoji:"🎨",type:"museum"}
+ {id:"bessborough",name:"Delta Bessborough",short:"Bessborough",x:95,z:125,emoji:"🏰",type:"hotel"},
+ {id:"midtown",name:"Midtown Plaza",short:"Midtown Plaza",x:-25,z:-25,emoji:"🛍",type:"shopping"},
+ {id:"nutrien",name:"Nutrien Tower",short:"Nutrien Tower",x:20,z:5,emoji:"🏙️",type:"tower"},
+ {id:"tcu",name:"TCU Place",short:"TCU Place",x:-55,z:-85,emoji:"🎭",type:"venue"},
+ {id:"cityhall",name:"Saskatoon City Hall",short:"City Hall",x:-85,z:95,emoji:"🏛️",type:"civic"},
+ {id:"library",name:"Frances Morrison Library",short:"Public Library",x:-119,z:95,emoji:"📚",type:"library"},
+ {id:"drinkle",name:"Drinkle Building",short:"Drinkle Building",x:-85,z:-25,emoji:"🏢",type:"heritage"},
+ {id:"senator",name:"Hotel Senator",short:"Hotel Senator",x:-85,z:-55,emoji:"🏨",type:"heritage"},
+ {id:"alt",name:"Alt Hotel Saskatoon",short:"Alt Hotel",x:65,z:-85,emoji:"🏨",type:"hotel"},
+ {id:"remai",name:"Remai Modern",short:"Remai Modern",x:95,z:-115,emoji:"🎨",type:"museum"}
 ];
 for(const p of places){
  if(p.id==="bessborough"){
-  const g=building(p.x,p.z,25,19,27,0xd7c7a8,0x425b4b,"heritage");
+  const g=building(p.x,p.z,20,19,27,0xd7c7a8,0x425b4b,"heritage");
   for(const [dx,dz] of [[-9,-6],[9,-6],[-9,6],[9,6]]){
    const shaft=new T.Mesh(new T.CylinderGeometry(1.7,2,14,8),mat(0xd8c7a8));shaft.position.set(dx,25,dz);shaft.castShadow=true;g.add(shaft);
    const roof=new T.Mesh(new T.ConeGeometry(2.8,6,4),mat(0x405849));roof.position.set(dx,35,dz);roof.rotation.y=Math.PI/4;g.add(roof);
   }
   const crown=new T.Mesh(new T.ConeGeometry(5,7,4),mat(0x405849));crown.position.set(0,31,0);crown.rotation.y=Math.PI/4;g.add(crown);
  }else if(p.id==="remai"){
-  const g=building(p.x,p.z,29,23,9,0x9a6349,0x514e4b,"modern");
+  const g=building(p.x,p.z,20,18,9,0x9a6349,0x514e4b,"modern");
   cube(g,3,8,0,25,3,20,mat(0xb67850));
   cube(g,-3,11,-1,20,2.2,17,mat(0xc58a5c));
   cube(g,0,2,11.7,25,3,.35,M.glass);
   cube(g,12,5,0,.4,10,19,M.glass);
  }else if(p.id==="midtown"){
-  const g=building(p.x,p.z,37,27,9,0xd8d7d0,0x666d70,"modern");
+  const g=building(p.x,p.z,24,20,9,0xd8d7d0,0x666d70,"modern");
   cube(g,0,7,13.8,30,4,.4,M.glass);
   cube(g,-2,10,0,22,1.4,19,mat(0xe8e5dc));
   cube(g,0,1.1,14.2,16,2.1,.3,mat(0x4c5558));
  }else if(p.id==="nutrien"){
-  const g=building(p.x,p.z,18,18,47,0x9daeb2,0x58666d,"glass");
+  const g=building(p.x,p.z,18,16,47,0x9daeb2,0x58666d,"glass");
   for(let y=5;y<44;y+=4)cube(g,0,y,9.16,17,.22,.12,mat(0x55717c));
   cube(g,0,49,0,6,2,6,mat(0x53636b));
  }else if(p.id==="tcu"){
-  const g=building(p.x,p.z,29,22,13,0xc9c7bf,0x5a6064,"modern");
+  const g=building(p.x,p.z,24,18,13,0xc9c7bf,0x5a6064,"modern");
   cube(g,0,8,11.2,26,7,.5,mat(0x59676e));
   cube(g,0,3,11.55,20,3,.25,M.glass);
  }else if(p.id==="cityhall"){
-  const g=building(p.x,p.z,23,18,12,0xc7c8c1,0x606b70,"modern");
+  const g=building(p.x,p.z,20,18,12,0xc7c8c1,0x606b70,"modern");
   cube(g,0,14,0,10,2,9,mat(0x6c7778));
   cube(g,0,1.5,9.2,16,2.8,.3,M.glass);
  }else if(p.id==="library"){
