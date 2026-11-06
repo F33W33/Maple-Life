@@ -5,7 +5,7 @@
   const SAVE_KEY = "mapleLifeSaveV1";
   const initialState = {
     name: "", avatar: "🧑🏽", province: "Saskatchewan", cash: 1000, job: null, home: "starter",
-    day: 1, hunger: 82, energy: 90, happiness: 76, inventory: [],
+    day: 1, hunger: 82, energy: 90, happiness: 76, inventory: [], applications: [],
     visited: [], rentPaid: false, tasks: []
   };
   let state = loadState();
@@ -147,15 +147,58 @@
     $(".sidebar").classList.remove("mobile-open");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+  function applicationFor(key) { return (state.applications || []).find(item => item.jobKey === key); }
   function updateJobButtons() {
-    $("[data-job]").forEach(button => {
-      const job = jobs[button.dataset.job];
-      const isCurrent = state.job && state.job.title === job.title;
-      button.textContent = isCurrent ? "Work 4-hour shift" : state.job ? "Already employed" : "Apply now";
-      button.disabled = !!state.job && !isCurrent;
-      button.style.opacity = button.disabled ? ".65" : "1";
+    $$("[data-job]").forEach(button => {
+      const job = jobs[button.dataset.job]; if (!job) return;
+      const current = state.job && state.job.title === job.title;
+      button.textContent = current ? "Work 4-hour shift" : "Already employed";
+      button.disabled = !current;
+    });
+    $$("[data-apply]").forEach(button => {
+      const app = applicationFor(button.dataset.apply);
+      button.textContent = state.job ? "Already employed" : app ? (app.status === "pending" ? "Pending" : app.status === "offer" ? "Offer received" : app.status === "accepted" ? "Hired" : "Apply again") : "Apply now";
+      button.disabled = !!state.job || !!(app && app.status !== "rejected");
+    });
+    renderCareerApplications();
+  }
+  function renderCareerApplications() {
+    const host = $("#careerApplications"); if (!host) return;
+    const apps = state.applications || []; if (!apps.length) { host.innerHTML = ""; return; }
+    host.innerHTML = '<div class="section-heading"><div><div class="eyebrow">YOUR JOB SEARCH</div><h2>Applications</h2></div></div><div class="application-list">' + apps.map(app => {
+      const job = jobs[app.jobKey]; if (!job) return "";
+      const label = app.status === "pending" ? "Awaiting employer response" : app.status === "offer" ? "Job offer received" : app.status === "accepted" ? "Offer accepted" : "Application not selected";
+      return '<article class="application-card"><div><b>' + job.title + '</b><small>' + job.place + ' · ' + money(job.wage) + '/hr</small></div><span class="application-status ' + app.status + '">' + label + '</span>' + (app.status === "offer" ? '<button class="primary-button small-button" data-accept-job="' + app.jobKey + '">Accept offer</button>' : "") + '</article>';
+    }).join("") + (apps.some(app => app.status === "pending") ? '<button class="outline-button" data-wait-employer>Wait until tomorrow · 1 day</button>' : "") + '</div>';
+  }
+  function respondToApplications() {
+    (state.applications || []).forEach(app => {
+      if (app.status !== "pending" || app.submittedDay >= state.day) return;
+      const score = (app.jobKey.length * 17 + app.submittedDay * 13 + state.day * 7) % 10;
+      app.status = score < 7 ? "offer" : "rejected"; app.respondedDay = state.day;
     });
   }
+  function applyForJob(key) {
+    if (!jobs[key] || state.job) { toast("You already have a job."); return; }
+    const old = applicationFor(key); if (old && old.status !== "rejected") return;
+    state.applications = (state.applications || []).filter(app => app.jobKey !== key);
+    state.applications.push({ jobKey: key, submittedDay: state.day, status: "pending" });
+    render(); if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
+    toast("Application sent! The employer will respond after the next day.");
+  }
+  function acceptJobOffer(key) {
+    const app = applicationFor(key), job = jobs[key]; if (!app || app.status !== "offer" || !job || state.job) return;
+    state.job = job; app.status = "accepted";
+    state.applications = state.applications.filter(item => item.jobKey === key);
+    render(); if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
+    toast("Offer accepted! You are now a " + job.title + ".");
+  }
+  function waitForEmployer() {
+    state.day += 1; changeNeed("energy", -3); respondToApplications(); render();
+    if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
+    toast("A new day in Maplewood. Check your applications for employer replies.");
+  }
+
   function updateHomeButtons() {
     $$("[data-home]").forEach(button => {
       const home = homes[button.dataset.home];
@@ -186,6 +229,7 @@
     changeNeed("hunger", -12);
     changeNeed("happiness", 3);
     state.day += 1;
+    respondToApplications();
     state.rentPaid = false;
     render();
     if ($("#gamePanel")?.classList.contains("open")) openGamePanel("jobs");
@@ -260,6 +304,12 @@
     if (actionButton) { activity(actionButton.dataset.action); return; }
     const placeButton = event.target.closest("[data-place]");
     if (placeButton) { openPlace(placeButton.dataset.place); return; }
+    const applyButton = event.target.closest("[data-apply]");
+    if (applyButton) { applyForJob(applyButton.dataset.apply); return; }
+    const acceptButton = event.target.closest("[data-accept-job]");
+    if (acceptButton) { acceptJobOffer(acceptButton.dataset.acceptJob); return; }
+    const waitButton = event.target.closest("[data-wait-employer]");
+    if (waitButton) { waitForEmployer(); return; }
     const jobButton = event.target.closest("[data-job]");
     if (jobButton) {
       const job = jobs[jobButton.dataset.job];
