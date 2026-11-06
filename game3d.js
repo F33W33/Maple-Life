@@ -74,65 +74,79 @@ function slab(x,z,w,d,m,y=-.25,h=.5){return cube(world,x,y,z,w,h,d,m);}
 // Compact Saskatoon-inspired playable footprint: approximately 9 km x 6.5 km.
 // Buildings, roads, residents and vehicles retain their existing density.
 const WORLD_W=300,WORLD_D=310,UNIT_METRES=10;
-const terrain=slab(0,0,WORLD_W,WORLD_D,M.land,-.6,1);terrain.receiveShadow=true;
-const localRoad=mat(0x657078),arterialRoad=mat(0x505b63),curb=mat(0xd4d0c2);
-// A dense 200-metre street grid with wider arterial roads every kilometre.
-for(let x=-130;x<=130;x+=20){
- const major=Math.abs(x%200)<.01;
- slab(x,0,major?3.2:1.35,WORLD_D-20,major?arterialRoad:localRoad,-.08,.18);
- if(major){slab(x-2.2,0,.45,WORLD_D-20,curb,.015,.1);slab(x+2.2,0,.45,WORLD_D-20,curb,.015,.1);}
+const terrain=slab(0,0,WORLD_W,WORLD_D,mat(0x929b8c),-.6,1);terrain.receiveShadow=true;
+const localRoad=mat(0x41494e),arterialRoad=mat(0x343c42),curb=mat(0xc4c4bc);
+const sidewalkMat=mat(0xb8b7ae),markingMat=mat(0xece8d8),grassMat=mat(0x7da66c);
+const roadXs=[-130,-100,-70,-40,-10,20,50,80];
+const roadZs=[-130,-100,-70,-40,-10,20,50,80,110,140];
+// Downtown's familiar rectangular street grid: numbered east-west streets and north-south avenues.
+for(const x of roadXs){
+ const major=[-100,-10,80].includes(x);
+ slab(x,0,major?5.2:3.8,WORLD_D-8,major?arterialRoad:localRoad,-.08,.2);
+ for(const side of [-1,1]){
+  slab(x+side*(major?4.1:3.2),0,2.1,WORLD_D-8,sidewalkMat,.015,.16);
+  slab(x+side*(major?5.45:4.45),0,.35,WORLD_D-8,curb,.09,.12);
+ }
 }
-for(let z=-140;z<=140;z+=20){
- const major=Math.abs(z%200)<.01;
- slab(0,z,WORLD_W-20,major?3.2:1.35,major?arterialRoad:localRoad,-.08,.18);
- if(major){slab(0,z-2.2,WORLD_W-20,.45,curb,.015,.1);slab(0,z+2.2,WORLD_W-20,.45,curb,.015,.1);}
+for(const z of roadZs){
+ const major=[-100,-10,80].includes(z);
+ slab(0,z,WORLD_W-8,major?5.2:3.8,major?arterialRoad:localRoad,-.08,.2);
+ for(const side of [-1,1]){
+  slab(0,z+side*(major?4.1:3.2),WORLD_W-8,2.1,sidewalkMat,.015,.16);
+  slab(0,z+side*(major?5.45:4.45),WORLD_W-8,.35,curb,.09,.12);
+ }
 }
-// South Saskatchewan River and its riverbank paths.
-slab(0,0,WORLD_W,25,M.water,-.04,.24);
-slab(0,-13.2,WORLD_W,.65,M.waterLight,.03,.08);
-slab(0,13.2,WORLD_W,.65,M.waterLight,.03,.08);
-slab(0,-17,WORLD_W,3.5,M.path,.05,.15);
-slab(0,17,WORLD_W,3.5,M.path,.05,.15);
-for(const x of [-100,0,100]){
- slab(x,0,9,34,M.bridge,.18,.5);
- for(let z=-13;z<=13;z+=6)cube(world,x,.48,z,9.4,.12,.45,M.white);
+// South Saskatchewan River runs along the east edge of the downtown core.
+slab(128,0,40,WORLD_D,M.water,-.04,.28);
+slab(106,0,.9,WORLD_D,M.waterLight,.08,.08);
+slab(149,0,.9,WORLD_D,M.waterLight,.08,.08);
+// Meewasin riverbank trail and landscaped River Landing / Kiwanis green spaces.
+slab(101,0,5,WORLD_D-10,M.path,.08,.16);
+slab(96,-91,19,48,grassMat,-.02,.12);
+slab(96,91,18,42,grassMat,-.02,.12);
+for(const z of [-105,-5,95]){
+ slab(128,z,48,9,M.bridge,.2,.55);
+ for(let x=108;x<=148;x+=7)cube(world,x,.52,z,3.6,.12,9.5,M.white);
+ for(const side of [-1,1])cube(world,128,.95,z+side*5.2,48,.25,.25,mat(0x747d80));
 }
-function park(x,z,w,d){
- // Keep park lawns continuous with the surrounding green terrain.
- slab(x,z,w*.7,.8,M.path,.02,.08);
- slab(x,z,w*.8,.8,M.path,.14,.12).rotation.y=Math.PI/2;
+// Street furniture, crosswalks and signals make intersections read like real city streets.
+for(const x of [-100,-10,80])for(const z of [-100,-10,80]){
+ for(let k=-2;k<=2;k++){
+  slab(x+k*1.35,z-7.4, .72,3.4,markingMat,.045,.05);
+  slab(x+k*1.35,z+7.4, .72,3.4,markingMat,.045,.05);
+ }
+ const pole=new T.Group();pole.position.set(x+7.2,0,z+7.2);world.add(pole);
+ cube(pole,0,3.4,0,.22,6.8,.22,M.dark);
+ cube(pole,0,6.1,0,.85,1.8,.55,mat(0x283238));
+ for(let j=0;j<3;j++){const lamp=new T.Mesh(new T.SphereGeometry(.22,8,8),mat([0xc94b42,0xd6b24a,0x4a9c5e][j]));lamp.position.set(0,6.7-j*.58,.3);pole.add(lamp);}
 }
-park(-105,105,45,40);park(105,105,45,40);park(-105,-105,45,40);
-// Building and rooftop silhouettes
 function building(x,z,w,d,h,color,roofColor=0x59616b,style="block"){
  const g=new T.Group();g.position.set(x,0,z);world.add(g);
- const wallMat=mat(color),roofMat=mat(roofColor),windowMat=new T.MeshStandardMaterial({color:0x9bc6d0,roughness:.28,metalness:.12});
+ const wallMat=mat(color),roofMat=mat(roofColor),glass=new T.MeshStandardMaterial({color:0x83b8c6,roughness:.24,metalness:.22});
  cube(g,0,h/2,0,w,h,d,wallMat);
- cube(g,0,h+.18,0,w+1.4,.38,d+1.4,roofMat);
- if(style==="tower"||h>14){cube(g,0,h+.95,0,w*.48,1.5,d*.48,wallMat);cube(g,0,h+1.78,0,w*.52,.22,d*.52,roofMat);}
- else if(style==="heritage"||style!=="modern"){
-  const roof=new T.Mesh(new T.ConeGeometry(Math.max(w,d)*.68,Math.max(2.4,h*.2),4),roofMat);roof.position.set(0,h+1,0);roof.rotation.y=Math.PI/4;roof.castShadow=true;g.add(roof);
- }
- const rows=Math.max(1,Math.floor(h/3.8)),cols=Math.max(2,Math.floor(w/3.6));
+ cube(g,0,h+.18,0,w+1,.36,d+1,roofMat);
+ const rows=Math.max(1,Math.floor(h/3.4)),cols=Math.max(2,Math.floor(w/2.8));
  for(let row=0;row<rows;row++){
-  const yy=2+row*(h-2.8)/rows;
+  const yy=2+row*(h-2.5)/rows;
   for(let col=0;col<cols;col++){
    const xx=-w/2+(col+.5)*w/cols;
-   cube(g,xx,yy,d/2+.025,Math.min(1.45,w/cols*.52),Math.min(1.65,h/rows*.55),.07,windowMat);
-   cube(g,xx,yy,-d/2-.025,Math.min(1.45,w/cols*.52),Math.min(1.65,h/rows*.55),.07,windowMat);
+   const ww=Math.min(1.55,w/cols*.58),hh=Math.min(1.8,h/rows*.58);
+   cube(g,xx,yy,d/2+.035,ww,hh,.08,style==="glass"?glass:M.glass);
+   cube(g,xx,yy,-d/2-.035,ww,hh,.08,style==="glass"?glass:M.glass);
   }
-  const sideCols=Math.max(2,Math.floor(d/3.8));
+  const sideCols=Math.max(2,Math.floor(d/3));
   for(let col=0;col<sideCols;col++){
    const zz=-d/2+(col+.5)*d/sideCols;
-   cube(g,w/2+.025,yy,zz,.07,Math.min(1.65,h/rows*.55),Math.min(1.45,d/sideCols*.52),windowMat);
-   cube(g,-w/2-.025,yy,zz,.07,Math.min(1.65,h/rows*.55),Math.min(1.45,d/sideCols*.52),windowMat);
+   cube(g,w/2+.035,yy,zz,.08,Math.min(1.8,h/rows*.58),Math.min(1.5,d/sideCols*.55),style==="glass"?glass:M.glass);
+   cube(g,-w/2-.035,yy,zz,.08,Math.min(1.8,h/rows*.58),Math.min(1.5,d/sideCols*.55),style==="glass"?glass:M.glass);
   }
  }
- cube(g,0,1.3,d/2+.08,Math.min(2.4,w*.18),2.6,.16,mat(0x475a52));
- cube(g,0,2.8,d/2+.45,Math.min(4,w*.36),.35,1,roofMat);
+ // Ground-floor storefront band and a recessed entrance.
+ cube(g,0,1.45,d/2+.07,w*.76,2.7,.12,mat(0x34454a));
+ cube(g,0,2.9,d/2+.16,w*.42,.28,.22,roofMat);
+ if(style==="tower"||style==="glass")cube(g,0,h+.9,0,w*.48,1.3,d*.48,roofMat);
  return g;
 }
-function trees(){ /* Tree count is controlled by the exact fifty-tree placement below. */ }
 function label(text,x,z,emoji=""){
  const c=document.createElement("canvas");c.width=512;c.height=128;
  const ctx=c.getContext("2d");ctx.clearRect(0,0,512,128);
@@ -146,148 +160,81 @@ function label(text,x,z,emoji=""){
  sprite.position.set(x,7,z);sprite.scale.set(17,4.25,1);sprite.renderOrder=20;world.add(sprite);
  return sprite;
 }
+// Ten recognizable downtown landmarks, positioned around a walkable street grid.
 const places=[
-{id:"university",name:"University of Saskatchewan",short:"U of S",x:42,z:67,emoji:"🏛",type:"campus"},
-{id:"ru hospital",name:"Royal University Hospital",short:"Royal University Hospital",x:68,z:69,emoji:"✚",type:"hospital"},
-{id:"diefenbaker",name:"Diefenbaker Canada Centre",short:"Diefenbaker Centre",x:14,z:67,emoji:"🏛",type:"museum"},
-{id:"kinsmen",name:"Kinsmen Park",short:"Kinsmen Park",x:-8,z:46,emoji:"🌳",type:"park"},
-{id:"playland",name:"Nutrien Playland",short:"Nutrien Playland",x:-22,z:48,emoji:"🎡",type:"park"},
-{id:"bessborough",name:"Delta Bessborough",short:"Delta Bessborough",x:-7,z:19,emoji:"🏨",type:"hotel"},
-{id:"kiwanis",name:"Kiwanis Memorial Park",short:"Kiwanis Park",x:-30,z:18,emoji:"🌳",type:"park"},
-{id:"riverlanding",name:"River Landing",short:"River Landing",x:17,z:-20,emoji:"📍",type:"attraction"},
-{id:"remai",name:"Remai Modern",short:"Remai Modern",x:35,z:-25,emoji:"🎨",type:"museum"},
-{id:"midtown",name:"Midtown Plaza",short:"Midtown Plaza",x:5,z:-48,emoji:"🛍",type:"shopping"},
-{id:"farmers",name:"Saskatoon Farmers' Market",short:"Farmers' Market",x:-30,z:-48,emoji:"🥕",type:"market"},
-{id:"broadway",name:"Broadway District",short:"Broadway",x:85,z:-42,emoji:"🎭",type:"district"},
-{id:"victoria",name:"Victoria Park",short:"Victoria Park",x:-85,z:-47,emoji:"🌳",type:"park"},
-{id:"riversdale",name:"Riversdale",short:"Riversdale",x:-62,z:-18,emoji:"🏘",type:"district"},
-{id:"westernmuseum",name:"Western Development Museum",short:"Western Development Museum",x:-98,z:-77,emoji:"🚂",type:"museum"},
-{id:"forestry",name:"Forestry Farm Park & Zoo",short:"Forestry Farm Zoo",x:100,z:80,emoji:"🦉",type:"park"},
-{id:"wanuskewin",name:"Wanuskewin Heritage Park",short:"Wanuskewin",x:-108,z:80,emoji:"🦬",type:"heritage"}
+ {id:"bessborough",name:"Delta Bessborough",short:"Bessborough",x:88,z:112,emoji:"🏰",type:"hotel"},
+ {id:"midtown",name:"Midtown Plaza",short:"Midtown Plaza",x:-22,z:-16,emoji:"🛍",type:"shopping"},
+ {id:"nutrien",name:"Nutrien Tower",short:"Nutrien Tower",x:20,z:12,emoji:"🏙️",type:"tower"},
+ {id:"tcu",name:"TCU Place",short:"TCU Place",x:-66,z:-88,emoji:"🎭",type:"venue"},
+ {id:"cityhall",name:"Saskatoon City Hall",short:"City Hall",x:-70,z:93,emoji:"🏛️",type:"civic"},
+ {id:"library",name:"Frances Morrison Library",short:"Public Library",x:-119,z:93,emoji:"📚",type:"library"},
+ {id:"drinkle",name:"Drinkle Building",short:"Drinkle Building",x:-85,z:-18,emoji:"🏢",type:"heritage"},
+ {id:"senator",name:"Hotel Senator",short:"Hotel Senator",x:-96,z:-62,emoji:"🏨",type:"heritage"},
+ {id:"alt",name:"Alt Hotel Saskatoon",short:"Alt Hotel",x:57,z:-82,emoji:"🏨",type:"hotel"},
+ {id:"remai",name:"Remai Modern",short:"Remai Modern",x:91,z:-111,emoji:"🎨",type:"museum"}
 ];
-for(const p of places){p.x*=4;p.z*=4;}
-places.push(
- {id:"stonebridge",name:"Stonebridge",short:"Stonebridge",x:330,z:-430,emoji:"🏘",type:"neighbourhood"},
- {id:"evergreen",name:"Evergreen",short:"Evergreen",x:650,z:480,emoji:"🌲",type:"neighbourhood"},
- {id:"lawson",name:"Lawson Heights",short:"Lawson Heights",x:-650,z:430,emoji:"🏡",type:"neighbourhood"},
- {id:"sutherland",name:"Sutherland",short:"Sutherland",x:570,z:80,emoji:"🏘",type:"neighbourhood"},
- {id:"nutana",name:"Nutana",short:"Nutana",x:270,z:-150,emoji:"🏡",type:"neighbourhood"},
- {id:"caswell",name:"Caswell Hill",short:"Caswell Hill",x:-270,z:160,emoji:"🏘",type:"neighbourhood"},
- {id:"brighton",name:"Brighton",short:"Brighton",x:780,z:-300,emoji:"🏡",type:"neighbourhood"},
- {id:"hampton",name:"Hampton Village",short:"Hampton Village",x:-760,z:-230,emoji:"🏘",type:"neighbourhood"}
-);
-// Distinctive landmark silhouettes inspired by Saskatoon's real buildings.
-function landmarkDetails(p){
- const x=p.x,z=p.z;
+for(const p of places){
  if(p.id==="bessborough"){
-  building(x,z,18,15,16,0xd8c7a7,0x526c58,"heritage");
-  cube(world,x,17.2,z,5,3,5,mat(0x53634f));
-  for(const [dx,dz] of [[-7,-5],[7,-5],[-7,5],[7,5]]){
-   cube(world,x+dx,8,z+dz,3.2,16,3.2,mat(0xd9c8a8));
-   const roof=new T.Mesh(new T.ConeGeometry(2.6,5,4),mat(0x425a4b));roof.position.set(x+dx,18.5,z+dz);world.add(roof);
+  const g=building(p.x,p.z,25,19,27,0xd7c7a8,0x425b4b,"heritage");
+  for(const [dx,dz] of [[-9,-6],[9,-6],[-9,6],[9,6]]){
+   const shaft=new T.Mesh(new T.CylinderGeometry(1.7,2,14,8),mat(0xd8c7a8));shaft.position.set(dx,25,dz);shaft.castShadow=true;g.add(shaft);
+   const roof=new T.Mesh(new T.ConeGeometry(2.8,6,4),mat(0x405849));roof.position.set(dx,35,dz);roof.rotation.y=Math.PI/4;g.add(roof);
   }
-  for(let i=-2;i<=2;i++)cube(world,x+i*3,11,z+7.65,1.2,5,.25,M.glass);
-  return;
+  const crown=new T.Mesh(new T.ConeGeometry(5,7,4),mat(0x405849));crown.position.set(0,31,0);crown.rotation.y=Math.PI/4;g.add(crown);
+ }else if(p.id==="remai"){
+  const g=building(p.x,p.z,29,23,9,0x9a6349,0x514e4b,"modern");
+  cube(g,3,8,0,25,3,20,mat(0xb67850));
+  cube(g,-3,11,-1,20,2.2,17,mat(0xc58a5c));
+  cube(g,0,2,11.7,25,3,.35,M.glass);
+  cube(g,12,5,0,.4,10,19,M.glass);
+ }else if(p.id==="midtown"){
+  const g=building(p.x,p.z,37,27,9,0xd8d7d0,0x666d70,"modern");
+  cube(g,0,7,13.8,30,4,.4,M.glass);
+  cube(g,-2,10,0,22,1.4,19,mat(0xe8e5dc));
+  cube(g,0,1.1,14.2,16,2.1,.3,mat(0x4c5558));
+ }else if(p.id==="nutrien"){
+  const g=building(p.x,p.z,18,18,47,0x9daeb2,0x58666d,"glass");
+  for(let y=5;y<44;y+=4)cube(g,0,y,9.16,17,.22,.12,mat(0x55717c));
+  cube(g,0,49,0,6,2,6,mat(0x53636b));
+ }else if(p.id==="tcu"){
+  const g=building(p.x,p.z,29,22,13,0xc9c7bf,0x5a6064,"modern");
+  cube(g,0,8,11.2,26,7,.5,mat(0x59676e));
+  cube(g,0,3,11.55,20,3,.25,M.glass);
+ }else if(p.id==="cityhall"){
+  const g=building(p.x,p.z,23,18,12,0xc7c8c1,0x606b70,"modern");
+  cube(g,0,14,0,10,2,9,mat(0x6c7778));
+  cube(g,0,1.5,9.2,16,2.8,.3,M.glass);
+ }else if(p.id==="library"){
+  const g=building(p.x,p.z,19,17,10,0xc5bba7,0x5c6261,"modern");
+  cube(g,0,7,8.7,14,4,.35,mat(0x7f9ca0));
+ }else if(p.id==="drinkle"){
+  const g=building(p.x,p.z,15,13,18,0x9a5d45,0x4b4947,"heritage");
+  for(let y=4;y<16;y+=4)cube(g,0,y,6.65,13,.22,.12,mat(0xeee1cc));
+ }else if(p.id==="senator"){
+  const g=building(p.x,p.z,15,13,15,0xb98a68,0x4c4e4b,"heritage");
+  const cupola=new T.Mesh(new T.ConeGeometry(3.2,4,8),mat(0x4b514c));cupola.position.set(0,18,0);g.add(cupola);
+ }else if(p.id==="alt"){
+  const g=building(p.x,p.z,19,17,24,0x9baeb2,0x4e5c64,"glass");
+  cube(g,0,24,0,13,1.5,12,mat(0x46575e));
  }
- if(p.id==="remai"){
-  const copper=mat(0x9a6245),copper2=mat(0xb87950);
-  cube(world,x,3.2,z,25,6,18,copper);cube(world,x+2,7.2,z-1,20,2,15,copper2);
-  cube(world,x-2,9,z+1,15,2,12,copper);cube(world,x,1.5,z+9.2,22,2.8,.35,M.glass);
-  cube(world,x+12,4,z,1,8,17,M.glass);return;
- }
- if(p.id==="midtown"){
-  building(x,z,30,24,8,0xe1e0d8,0x777b7b,"modern");
-  cube(world,x,9,z,12,3,10,M.glass);
-  for(let i=-2;i<=2;i++)cube(world,x+i*5,3,z+12.2,3,3,.25,M.glass);
-  return;
- }
- if(p.id==="ru hospital"){
-  building(x,z,17,15,20,0xe8e8e1,0x657782,"tower");
-  building(x-10,z+9,10,10,10,0xd9e0df,0x647985,"modern");
-  cube(world,x,22,z+7.8,4,2,.4,mat(0xb64c4c));cube(world,x,22,z+7.8,.8,4,.45,M.white);return;
- }
- if(p.id==="university"){
-  building(x,z,20,15,8,0xc9c1ae,0x555b58,"heritage");
-  cube(world,x,13,z,6,10,6,mat(0x777568));
-  const roof=new T.Mesh(new T.ConeGeometry(4.2,5,4),mat(0x46534c));roof.position.set(x,20,z);world.add(roof);
-  for(let i=-3;i<=3;i++)cube(world,x+i*2.5,5,z+7.7,1.1,4,.25,M.glass);return;
- }
- if(p.id==="diefenbaker"){
-  building(x,z,17,13,7,0xd8d2c2,0x66665f,"heritage");
-  for(let i=-3;i<=3;i++)cube(world,x+i*2.2,4,z+6.7,.8,4,.2,M.glass);
-  cube(world,x,8,z,6,1.2,5,mat(0x7b786c));return;
- }
- if(p.id==="farmers"){
-  building(x,z,21,16,5,0xd8d0b9,0x9a6749,"market");
-  const canopy=new T.Mesh(new T.ConeGeometry(12,4,4),mat(0x9b6849));canopy.rotation.y=Math.PI/4;canopy.position.set(x,8,z);world.add(canopy);
-  for(let i=-3;i<=3;i++)cube(world,x+i*2.5,2.7,z+8.2,1.2,4,.2,M.glass);return;
- }
- if(p.id==="westernmuseum"){
-  building(x,z,22,14,6,0xb99b75,0x5c5146,"heritage");cube(world,x,7,z,7,3,15,mat(0x725d49));return;
- }
- if(p.type==="neighbourhood"){
-  const palette=[0xd9c5a7,0xc8d2c4,0xd9b7a5,0xc4cbd3,0xe3d8c2];
-  for(let i=0;i<5;i++)building(x+(i-2)*13,z+(i%2)*12,7+(i%3),6+(i%2),4+(i%3),palette[i],0x665c53,i%2?"heritage":"block");
-  return;
- }
- if(p.type==="park"){trees(x,z,7,18);return;}
- if(p.type==="museum"){building(x,z,17,13,7,0xe5e2d8,0x515960,"modern");cube(world,x,8,z,8,1.5,4,M.glass);return;}
- if(p.type==="district"){
-  const colours=[0xd9b99a,0xc98f78,0xe2cda8,0xc4d1c4,0xd8b9a7];
-  for(let i=0;i<7;i++)building(x+(i-3)*8,z+(i%2)*9,6,6,4+i%3,colours[i%5],0x665d55,i%2?"heritage":"block");
-  return;
- }
- if(p.type==="hotel"){building(x,z,14,12,13,0xd9c8aa,0x536a58,"heritage");return;}
- if(p.type==="shopping"){building(x,z,23,17,7,0xe3e0d7,0x77736a,"modern");return;}
- building(x,z,12,10,6,0xd8d1c2,0x65666a,"block");
+ label(p.short,p.x,p.z-22,p.emoji);
 }
-// Keep exactly ten visible buildings in this compact town.
-places.length=10;
-const compactBuildingPositions=[[-105,92],[-52,92],[0,92],[52,92],[105,92],[-105,-92],[-52,-92],[0,-92],[52,-92],[105,-92]];
-for(let i=0;i<10;i++){
-  places[i].x=compactBuildingPositions[i][0];
-  places[i].z=compactBuildingPositions[i][1];
- const p=places[i];
- const palette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1];
- building(p.x,p.z,10+(i%3)*2,9+(i%2)*2,6+(i%4)*1.5,palette[i%palette.length],0x625f5a,i%3===0?"heritage":"block");
- label(p.short,p.x,p.z-24,p.emoji);
+// Small public squares, street planters and a continuous riverside promenade.
+for(const [x,z,w,d] of [[-35,48,22,18],[65,-45,20,24],[91,62,18,28]]){
+ slab(x,z,w,d,grassMat,-.02,.12);
+ for(let i=-1;i<=1;i++)slab(x+i*5,z,1,d-4,M.path,.06,.12);
 }
-// Tighter downtown blocks: compact homes and shops fill the gaps between
-// the existing landmarks while staying clear of the river, parks and landmarks.
-const infillPalette=[0xd8c4a8,0xc7d3c5,0xd9b5a2,0xc5cbd4,0xe2d7c1,0xd0c0ad,0xbfcfc7];
-let infillIndex=0;
-for(let x=999;x<=130;x+=20){
- for(let z=-150;z<=150;z+=20){
-  if(Math.abs(z)<25)continue;
-  const nearLandmark=places.some(p=>p.type!=="neighbourhood"&&Math.hypot(p.x-(x+10),p.z-(z+10))<24);
-  const nearPark=[[-350,220,55],[370,180,58],[190,-300,55],[-360,-280,58],[60,280,45],[-170,300,48]].some(([px,pz,r])=>Math.hypot(px-(x+10),pz-(z+10))<r);
-  if(nearLandmark||nearPark)continue;
-  const colour=infillPalette[infillIndex%infillPalette.length];
-  const width=6.5+(infillIndex%3)*.7,depth=7+(infillIndex%2)*.8,height=4.5+(infillIndex%4)*1.1;
-  building(x+10,z+10,width,depth,height,colour,infillIndex%3===0?0x765e50:0x625f5a,infillIndex%4===0?"heritage":"block");
-  infillIndex++;
- }
-}
-// A few denser residential clusters extend the built-up feel beyond downtown.
-for(const [cx,cz] of []){
- for(let ix=-1;ix<=1;ix++)for(let iz=-1;iz<=1;iz++){
-  if(ix===0&&iz===0)continue;
-  const j=Math.abs(ix*3+iz+4);
-  building(cx+ix*13,cz+iz*13,6.5,7,4.5+(j%3),infillPalette[j%infillPalette.length],0x665b52,j%3===0?"heritage":"block");
- }
-}
-// Local street boards along main roads
+// A downtown sign and named avenue markers.
 function roadSign(x,z,txt){
  const g=new T.Group();g.position.set(x,0,z);world.add(g);
- cube(g,0,1.1,0,.25,2.2,.25,M.dark);
- cube(g,0,2.2,0,6.8,1.35,.22,M.sign);
+ cube(g,0,1.1,0,.25,2.2,.25,M.dark);cube(g,0,2.2,0,6.8,1.35,.22,M.sign);
  const c=document.createElement("canvas");c.width=512;c.height=128;const ctx=c.getContext("2d");
  ctx.fillStyle="#eaf0d9";ctx.fillRect(0,0,512,128);ctx.fillStyle="#263a35";ctx.font="bold 48px Arial";ctx.textAlign="center";ctx.fillText(txt,256,82);
  const tex=new T.CanvasTexture(c);const face=new T.Mesh(new T.PlaneGeometry(6.4,1.25),new T.MeshBasicMaterial({map:tex}));face.position.set(0,2.2,.13);g.add(face);
 }
-roadSign(-46,-34,"DOWNTOWN");roadSign(56,-34,"BROADWAY");roadSign(-49,35,"UNIVERSITY");
-trees(-50,64,7,14);trees(54,46,7,14);trees(-92,8,7,12);trees(94,-8,7,12);
-// Living streets: leafy parks, tiny pedestrians and moving traffic.
+roadSign(-43,-38,"21ST STREET");
+roadSign(53,39,"SPADINA CRESCENT");
+roadSign(-112,22,"2ND AVENUE");
 const iTreeMats=[mat(0x398653),mat(0x579c5d),mat(0x78ad68),mat(0x2f754c)];
 function streetTree(x,z,scale=1){
  const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);
@@ -295,20 +242,17 @@ function streetTree(x,z,scale=1){
  const crown=new T.Mesh(new T.IcosahedronGeometry(1.2,1),iTreeMats[Math.floor(Math.abs(x+z))%iTreeMats.length]);crown.position.y=2.05;crown.castShadow=true;crown.receiveShadow=true;g.add(crown);
  const crown2=new T.Mesh(new T.IcosahedronGeometry(.82,1),iTreeMats[Math.floor(Math.abs(x-z)+1)%iTreeMats.length]);crown2.position.set(.48,2.42,.12);crown2.castShadow=true;g.add(crown2);
 }
-// Exactly fifty trees, arranged in a compact 10-by-5 town grove.
-for(let i=0;i<50;i++){
- const col=i%10,row=Math.floor(i/10);
- const x=-128+col*(256/9)+(row%2?8:0);
- const z=[-132,-82,-32,32,82][row];
- streetTree(x,z,.8);
+// Exactly fifty trees, spread along downtown sidewalks and the riverfront.
+const treeXs=[-132,-108,-45,72,108],treeZs=[-132,-102,-72,-42,-12,18,48,78,108,138];
+for(const x of treeXs)for(const z of treeZs)streetTree(x,z,.8);
+// Streetlights on the main downtown avenues.
+for(const [x,z] of [[-100,-118],[-100,-48],[-100,42],[-10,-118],[-10,42],[80,-48],[80,118],[102,-30],[102,30]]){
+ const lamp=new T.Group();lamp.position.set(x,0,z);world.add(lamp);
+ cube(lamp,0,3,0,.18,6,.18,M.dark);
+ const arm=cube(lamp,.9,5.7,0,1.9,.12,.12,M.dark);
+ const bulb=new T.Mesh(new T.SphereGeometry(.35,8,8),mat(0xffe4a8));bulb.position.set(1.75,5.55,0);lamp.add(bulb);
 }
-// Pavement strips and dashed markings make the larger avenues read as streets.
-const sidewalkMat=mat(0xc9c6b8),markingMat=mat(0xe9e4ce);
-for(const x of [-100,0,100]){slab(x-3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);slab(x+3.1,0,.8,WORLD_D-30,sidewalkMat,-.005,.12);}
-for(const z of [-100,0,100]){slab(0,z-3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);slab(0,z+3.1,WORLD_W-30,.8,sidewalkMat,-.005,.12);}
-for(const x of [-100,0,100])for(let z=-140;z<140;z+=18)slab(x,z,.10,7,markingMat,.035,.035);
-for(const z of [-100,0,100])for(let x=-130;x<130;x+=18)slab(x,z,7,.10,markingMat,.035,.035);
-// Tiny residents walking along sidewalks and park paths; routes avoid the river channel.
+// Twenty residents walking along downtown sidewalks.
 const pedestrianMats=[mat(0x397bb0),mat(0xc46d4c),mat(0x8a6bb0),mat(0x4e9564),mat(0xd1a34d),mat(0x53616c)];
 const skinMats=[mat(0xc98f6b),mat(0x8f5d43),mat(0xe0b28c),mat(0x6f4636),mat(0xb87959)];
 const pedestrians=[];
@@ -318,11 +262,16 @@ function addPedestrian(x,z,index,dx,dz){
  cube(g,0,1.05,0,.48,.68,.28,shirt);cube(g,0,1.62,0,.34,.38,.34,skin);cube(g,0,1.82,-.015,.35,.12,.35,mat(0x40352f));
  const leftArm=cube(g,-.31,1.05,0,.16,.56,.17,shirt),rightArm=cube(g,.31,1.05,0,.16,.56,.17,shirt);
  const leftLeg=cube(g,-.13,.42,0,.18,.65,.2,pants),rightLeg=cube(g,.13,.42,0,.18,.65,.2,pants);
- pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx, dz});
+ pedestrians.push({group:g,leftArm,rightArm,leftLeg,rightLeg,phase:index*.9,homeX:x,homeZ:z,dx,dz});
 }
-const walkingRoutes=[[-120,-120,1,0],[-60,-120,0,1],[0,-120,-1,0],[60,-120,0,1],[120,-120,-1,0],[-120,-60,0,1],[-60,-60,1,0],[0,-60,0,-1],[60,-60,-1,0],[120,-60,0,1],[-120,60,1,0],[-60,60,0,-1],[0,60,-1,0],[60,60,0,1],[120,60,-1,0],[-120,120,0,-1],[-60,120,1,0],[0,120,0,-1],[60,120,-1,0],[120,120,0,-1]];
-walkingRoutes.slice(0,20).forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
-// Colourful compact cars cruise the main roads in both directions.
+const walkingRoutes=[
+ [-122,-118,0,1],[-92,-118,1,0],[-48,-118,0,1],[-5,-118,1,0],[42,-118,0,1],
+ [-122,-48,0,-1],[-88,-48,1,0],[-45,-48,0,1],[45,-48,-1,0],[100,-48,0,1],
+ [-122,42,0,1],[-88,42,-1,0],[-45,42,0,-1],[-5,42,1,0],[62,42,0,-1],
+ [-122,118,0,-1],[-88,118,1,0],[-45,118,0,-1],[45,118,-1,0],[100,118,0,-1]
+];
+walkingRoutes.forEach((p,i)=>addPedestrian(p[0],p[1],i,p[2]*(.012+(i%3)*.003),p[3]*(.012+(i%3)*.003)));
+// Five cars follow the downtown avenue grid.
 const carPaint=[0xc64f43,0x397da5,0xe1e0d5,0x343f4a,0xd39a3f,0x57916c,0x8b6ca4],cars=[],tireMat=mat(0x202428);
 const carWindow=new T.MeshStandardMaterial({color:0x9dcbd3,roughness:.22,metalness:.12});
 function addCar(axis,fixed,position,direction,index){
@@ -332,10 +281,10 @@ function addCar(axis,fixed,position,direction,index){
  for(const side of [-1,1]){cube(g,side*.43,.55,1.19,.22,.16,.05,mat(0xffefbd));cube(g,side*.43,.55,-1.19,.2,.15,.05,mat(0xb73b32));}
  cars.push({group:g,axis,fixed:fixed+(direction>0?-.58:.58),position,direction,speed:2.2+(index%4)*.35});
 }
-for(let i=0;i<5;i++){const road=-100+i*50;addCar("z",road,-140+(i%3)*70,i%2?1:-1,i);}
+[-100,-40,20,50,80].forEach((road,i)=>addCar("z",road,-140+(i%3)*70,i%2?1:-1,i));
 
 // Player marker with simple blocky avatar
-const player={x:0,z:-112,yaw:0};const avatar=new T.Group();world.add(avatar);
+const player={x:-35,z:-35,yaw:0};const avatar=new T.Group();world.add(avatar);
 cube(avatar,0,1,0,1,1.2,.65,mat(0x368dc4));
 cube(avatar,0,1.95,0,.78,.75,.7,mat(0xc9906d));
 cube(avatar,0,2.35,0,.8,.2,.72,mat(0x302b29));
@@ -440,7 +389,7 @@ function frame(t){
  if(keys.KeyA||keys.ArrowLeft)dx-=1;if(keys.KeyD||keys.ArrowRight)dx+=1;
  const len=Math.hypot(dx,dz);
  if(len){dx/=len;dz/=len;const speed=keys.ShiftLeft||keys.ShiftRight?.55:.22;
- player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-140,140);
+ player.x=T.MathUtils.clamp(player.x+dx*speed*dt,-145,112);
  player.z=T.MathUtils.clamp(player.z+dz*speed*dt,-145,145);walk+=dt*speed;
  player.yaw=Math.atan2(dx,dz);
  }
@@ -476,7 +425,7 @@ function frame(t){
  const near=nearest(),hint=document.getElementById("gameInteract");
  if(hint){hint.classList.toggle("visible",!!near);hint.innerHTML=near?"Press <b>E</b> to explore "+near.name:"";}
  const loc=document.getElementById("gameLocation");
- if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  TINY TOWN · QUARTER SIZE";
+ if(loc)loc.textContent="📍 "+(near?near.name:"SASKATOON · SASKATCHEWAN")+"  ·  DOWNTOWN SASKATOON";
 
 }
 requestAnimationFrame(frame);
