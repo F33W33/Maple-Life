@@ -490,3 +490,17 @@ body.auth-complete #characterScreen{display:none!important;visibility:hidden!imp
 #mapleGame .career-phone-info>strong small{font-size:9px;font-weight:500;color:#84947e}
 #mapleGame .career-apply-button{grid-column:2;justify-self:start;min-width:82px;margin-top:2px;padding:7px 11px;border:0;border-radius:9px;background:#e7f0e1;color:#365a3b;font-size:9px;font-weight:900;cursor:pointer}
 #mapleGame .career-apply-button:disabled{background:#f0f2ed;color:#9aa497;cursor:default}
+
+
+/* Career application tracking */
+.application-list{display:grid;gap:10px;margin:14px 0 26px}
+.application-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:12px}
+.application-card>div{display:grid;gap:4px}
+.application-card b{font:800 13px Manrope;color:var(--ink)}
+.application-card small{font-size:10px;color:var(--muted)}
+.application-status{font-size:10px;font-weight:800;padding:7px 10px;border-radius:20px;background:#f3f3ed;color:#687568}
+.application-status.pending{background:#fff5df;color:#9a762d}
+.application-status.offer{background:#eaf4e7;color:#47734b}
+.application-status.rejected{background:#f8eeee;color:#a65c5c}
+.application-status.accepted{background:#eaf4e7;color:#47734b}
+#mapleGame .career-work-button[data-wait-employer]{width:100%;margin-top:12px}
